@@ -4,9 +4,9 @@ namespace FeelKnitService.Modules
 {
     public abstract class BaseModule : NancyModule
     {
-        protected readonly FeelingsContext Context = new FeelingsContext();
+        protected new readonly FeelingsContext Context = new FeelingsContext();
 
-        public BaseModule(string path)
+        protected BaseModule(string path)
             : base(path)
         {
 
