@@ -25,19 +25,19 @@ namespace FeelKnitService.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("mongodb://localhost")]
-        public string FeelingsConnectionString {
+        [global::System.Configuration.DefaultSettingValueAttribute("Feelings")]
+        public string FeelingsDatabase {
             get {
-                return ((string)(this["FeelingsConnectionString"]));
+                return ((string)(this["FeelingsDatabase"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Feelings")]
-        public string FeelingsDatabase {
+        [global::System.Configuration.DefaultSettingValueAttribute("mongodb://localhost")]
+        public string MONGOHQ_URL {
             get {
-                return ((string)(this["FeelingsDatabase"]));
+                return ((string)(this["MONGOHQ_URL"]));
             }
         }
     }

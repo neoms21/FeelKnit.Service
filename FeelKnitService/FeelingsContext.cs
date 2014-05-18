@@ -17,7 +17,7 @@ namespace FeelKnitService
 
         public FeelingsContext()
         {
-            var client = new MongoClient(Settings.Default.FeelingsConnectionString);
+            var client = new MongoClient(Settings.Default.MONGOHQ_URL);
             var server = client.GetServer();
             Database = server.GetDatabase(Settings.Default.FeelingsDatabase);
             Feelings.CreateIndex(IndexKeys<Feeling>.Ascending(x => x.Location));
