@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="FeelingsDatabase" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Feelings</Value>
+      <Value Profile="(Default)">294803ec_f609_4dfb_b908_7d054b5ec1db</Value>
     </Setting>
     <Setting Name="MONGOHQ_URL" Type="System.String" Scope="Application">
       <Value Profile="(Default)">mongodb://localhost</Value>

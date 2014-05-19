@@ -25,7 +25,7 @@ namespace FeelKnitService.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Feelings")]
+        [global::System.Configuration.DefaultSettingValueAttribute("294803ec_f609_4dfb_b908_7d054b5ec1db")]
         public string FeelingsDatabase {
             get {
                 return ((string)(this["FeelingsDatabase"]));
