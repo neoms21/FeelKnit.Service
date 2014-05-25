@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeelKnitService", "FeelKnit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeelKnit.Tests", "FeelKnit.Tests\FeelKnit.Tests.csproj", "{D53FC853-6B04-4200-A3D3-D8FA808DF986}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCreator", "DataCreator\DataCreator.csproj", "{13528C53-9EF4-4176-9FCD-D343A72A9CC0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{D53FC853-6B04-4200-A3D3-D8FA808DF986}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D53FC853-6B04-4200-A3D3-D8FA808DF986}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D53FC853-6B04-4200-A3D3-D8FA808DF986}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13528C53-9EF4-4176-9FCD-D343A72A9CC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13528C53-9EF4-4176-9FCD-D343A72A9CC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13528C53-9EF4-4176-9FCD-D343A72A9CC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13528C53-9EF4-4176-9FCD-D343A72A9CC0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

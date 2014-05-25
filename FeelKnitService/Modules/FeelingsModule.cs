@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FeelKnitService.Model;
@@ -13,8 +14,14 @@ namespace FeelKnitService.Modules
         public FeelingsModule()
             : base("/feelings")
         {
+            Get["/"] = r => AllFeelings();
             Get["/{feel}"] = r => FindFeelings(r.feel);
             Post["/"] = r => CreateFeeling();
+        }
+
+        private IEnumerable<Feeling> AllFeelings()
+        {
+            return Context.Feelings.FindAll();
         }
 
         private IEnumerable<Feeling> FindFeelings(object feel)
@@ -28,7 +35,7 @@ namespace FeelKnitService.Modules
             var feeling = this.Bind<Feeling>();
             feeling.FeelingDate = DateTime.UtcNow;//.ToString("dd/MMM/yyyy HH:mm:ss");
             Context.Feelings.Insert(feeling);
-            var allFeelings =  FindFeelings(feeling.FeelingText).ToList();
+            var allFeelings = FindFeelings(feeling.FeelingText).ToList();
             var currentFeeling = allFeelings.FirstOrDefault(f => f.Id == feeling.Id);
             allFeelings.Remove(currentFeeling);
             return allFeelings;
