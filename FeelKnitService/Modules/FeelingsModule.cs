@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FeelKnitService.Model;
 using MongoDB.Bson;
+using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using Nancy.ModelBinding;
 
@@ -16,12 +17,20 @@ namespace FeelKnitService.Modules
         {
             Get["/"] = r => AllFeelings();
             Get["/{feel}"] = r => FindFeelings(r.feel);
+            Get["/username/{username}"] = r => FindFeelingsForUser(r.username);
+            
             Post["/"] = r => CreateFeeling();
         }
 
         private IEnumerable<Feeling> AllFeelings()
         {
             return Context.Feelings.FindAll();
+        }
+
+        private IEnumerable<Feeling> FindFeelingsForUser(object username)
+        {
+            MongoCursor<Feeling> findFeelingsForUser = Context.Feelings.Find(Query.EQ("UserName", new BsonString(username.ToString())));
+            return findFeelingsForUser;
         }
 
         private IEnumerable<Feeling> FindFeelings(object feel)

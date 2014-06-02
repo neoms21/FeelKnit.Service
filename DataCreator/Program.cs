@@ -66,12 +66,13 @@ namespace DataCreator
         static void Main(string[] args)
         {
             _javaScriptSerializer = new JavaScriptSerializer();
-            //_jsonString = javaScriptSerializer.Serialize(new User { UserName = "xyz", Password = "welcome1", EmailAddress = "ksjdf@fkjsd.com" });
+            //_jsonString = javaScriptSerializer.Serialize(new User { User = "xyz", Password = "welcome1", EmailAddress = "ksjdf@fkjsd.com" });
 
 
-            //CreateUsers();
-            //CreateFeelings();
+            CreateUsers();
+            CreateFeelings();
             CreateComments();
+            Console.WriteLine("Done!!!!");
             Console.ReadLine();
             // PostRequest(jsonString, URL);
         }
@@ -90,7 +91,7 @@ namespace DataCreator
                     var comment = new Comment()
                     {
                         Text = _comments[random.Next(1, 7)],
-                        UserName = "User" + random.Next(1, 11)
+                        User = "User" + random.Next(1, 11)
                     };
 
                     PostRequest(_javaScriptSerializer.Serialize(comment),
@@ -133,7 +134,7 @@ namespace DataCreator
                     EmailAddress = username + "@gmail.com"
                 };
                 PostRequest(_javaScriptSerializer.Serialize(user), "http://localhost/FeelKnitService/users");
-                Console.WriteLine("Success for {0}", username);
+                //Console.WriteLine("Success for {0}", username);
             }
         }
 

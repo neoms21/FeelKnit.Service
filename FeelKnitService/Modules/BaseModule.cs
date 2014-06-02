@@ -1,4 +1,6 @@
-﻿using Nancy;
+﻿using System;
+using Nancy;
+using Nancy.Json;
 
 namespace FeelKnitService.Modules
 {
@@ -9,7 +11,7 @@ namespace FeelKnitService.Modules
         protected BaseModule(string path)
             : base(path)
         {
-
+            JsonSettings.MaxJsonLength = Int32.MaxValue;
         }
     }
 }
