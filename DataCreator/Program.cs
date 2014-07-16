@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using FeelKnitService;
 using FeelKnitService.Model;
 using Nancy.Json;
 
@@ -68,13 +69,26 @@ namespace DataCreator
             _javaScriptSerializer = new JavaScriptSerializer();
             //_jsonString = javaScriptSerializer.Serialize(new User { User = "xyz", Password = "welcome1", EmailAddress = "ksjdf@fkjsd.com" });
 
-
-            CreateUsers();
-            CreateFeelings();
-            CreateComments();
+            CreateFeels();
+            //CreateUsers();
+            //CreateFeelings();
+            // CreateComments();
             Console.WriteLine("Done!!!!");
             Console.ReadLine();
             // PostRequest(jsonString, URL);
+        }
+
+        private static void CreateFeels()
+        {
+            foreach (var f in _feelings)
+            {
+                var feeling = new Feel
+                {
+                    Text = f
+                };
+                PostRequest(_javaScriptSerializer.Serialize(feeling), "http://localhost/FeelKnitService/feelings/createfeel");
+            }
+
         }
 
         private static void CreateComments()
@@ -102,23 +116,42 @@ namespace DataCreator
             }
         }
 
+        private static void CreateComments(Feeling feeling)
+        {
+            var random = new Random();
+
+            for (var i = 0; i < 20; i++)
+            {
+
+                var comment = new Comment()
+                {
+                    Text = _comments[random.Next(1, 7)],
+                    User = "User" + random.Next(1, 11),
+                    PostedAt = feeling.FeelingDate.AddMinutes(10 + i)
+                };
+                feeling.Comments.Add(comment);
+            }
+        }
+
         private static void CreateFeelings()
         {
-            for (int i = 1; i < 201; i++)
+            for (var i = 1; i < 201; i++)
             {
-                int index = new Random().Next(1, _locations.Count);
+                var index = new Random().Next(1, _locations.Count);
                 var feeling = new Feeling
                 {
                     FeelingText = _feelings[GetRandom(_feelings.Count())],
+                    FeelingDate = DateTime.UtcNow.AddDays(-new Random().Next(1, 11)),
                     UserName = "User" + new Random().Next(1, 11),
                     Reason = "reason for feeling",
                     Action = "action for feeling",
                     Longitude = _locations[index].Item2,
                     Latitude = _locations[index].Item1,
-
+                    Comments = new List<Comment>()
                 };
-
+                CreateComments(feeling);
                 PostRequest(_javaScriptSerializer.Serialize(feeling), "http://localhost/FeelKnitService/feelings");
+                Console.WriteLine("Feeling num {0} created", i);
             }
         }
 

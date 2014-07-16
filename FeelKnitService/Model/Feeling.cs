@@ -39,6 +39,8 @@ namespace FeelKnitService.Model
 
         public string Action { get; set; }
 
+        public int SupportCount { get; set; }
+
         public double[] Location { get; set; }
 
         public IList<Comment> Comments { get; set; }

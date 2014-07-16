@@ -5,6 +5,8 @@ using System.Linq;
 using System.Web;
 using FeelKnitService.Model;
 using FeelKnitService.Properties;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 
@@ -37,6 +39,19 @@ namespace FeelKnitService
         {
             get { return Database.GetCollection<Feeling>("Feelings"); }
         }
+        
+        public MongoCollection<Feel> Feels
+        {
+            get { return Database.GetCollection<Feel>("Feels"); }
+        }
 
+    }
+
+    public class Feel
+    {
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
+
+        public string Text { get; set; }
     }
 }
