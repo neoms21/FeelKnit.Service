@@ -13,9 +13,19 @@ namespace FeelKnitService.Modules
             : base("/users")
         {
             Get["/"] = r => new User { UserName = "Manoj" };
-            
+
             Post["/"] = r => CreateUser();
             Post["/Verify"] = r => VerfiyUser();
+            Post["/clientkey"] = r => SaveKey();
+        }
+
+        private bool SaveKey()
+        {
+            var user = this.Bind<User>();
+            var dbUser = Context.Users.FindOne(Query<User>.EQ(u => u.UserName, user.UserName));
+            dbUser.Key = user.Key;
+            Context.Users.Save(dbUser);
+            return true;
         }
 
 
@@ -32,7 +42,6 @@ namespace FeelKnitService.Modules
 
         private User CreateUser()
         {
-
             var user = this.Bind<User>();
             var x = Context.Users.Insert(user);
             return user;
