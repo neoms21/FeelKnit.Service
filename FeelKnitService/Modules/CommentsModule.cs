@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using FeelKnitService.Model;
 using MongoDB.Bson;
 using MongoDB.Driver.Builders;
@@ -9,7 +10,8 @@ namespace FeelKnitService.Modules
 {
     public class CommentsModule : BaseModule
     {
-        public CommentsModule() : base("/comments")
+        public CommentsModule()
+            : base("/comments")
         {
             Post["/{feelingId}"] = r => AddComment(r.feelingId);
         }
@@ -22,7 +24,14 @@ namespace FeelKnitService.Modules
             var modUpdate = Update<Feeling>.Push(p => p.Comments, comment);
 
             Context.Feelings.Update(Query.EQ("_id", new ObjectId(feelingId)), modUpdate);
+            Task.Factory.StartNew(() => SendNotification(comment.User));
+
             return comment;
+        }
+
+        private void SendNotification(string username)
+        {
+            new GcmService().SendRequest(username);
         }
     }
 }
