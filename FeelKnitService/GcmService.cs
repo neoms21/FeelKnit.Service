@@ -1,11 +1,7 @@
-﻿
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Web;
 using Newtonsoft.Json.Linq;
 
 namespace FeelKnitService
@@ -13,22 +9,21 @@ namespace FeelKnitService
     public class GcmService
     {
 
-        public void SendRequest(string userName)
+        public void SendRequest(string userName, string gcmKey)
         {
             // Create a request using a URL that can receive a post. 
             var request = WebRequest.Create("https://android.googleapis.com/gcm/send");
             // Set the Method property of the request to POST.
             request.Method = "POST";
-            string deviceId = "APA91bGehTL2Qcxd0nZO0Tz2x_EAu8bo5oFqFXjwqJMG4MrxwXwfg4sbhtijBQd8E__xIffe71q9X_Qt1e1EzcYGA0ZzZ1veB8387a5O9EDCEJ8iDRFeGiAm_9eHXjblxDCvmkYWmpFMVppxZlADiztG1xEhAKnA19fl4VT7fl88-cOVYN3eFic";
 
             var x = new JObject();
             var arr = new JArray
             {
-                "APA91bGehTL2Qcxd0nZO0Tz2x_EAu8bo5oFqFXjwqJMG4MrxwXwfg4sbhtijBQd8E__xIffe71q9X_Qt1e1EzcYGA0ZzZ1veB8387a5O9EDCEJ8iDRFeGiAm_9eHXjblxDCvmkYWmpFMVppxZlADiztG1xEhAKnA19fl4VT7fl88-cOVYN3eFic"
+                gcmKey
             };
 
             x.Add("registration_ids", arr);
-            var data = new JObject { { "message", "Youv'e received commen on your recent feeling from" }, { "user", userName } };
+            var data = new JObject { { "message", "Youv'e received comment on your recent feeling from" }, { "user", userName } };
             x.Add("data", data);
             var postData = Newtonsoft.Json.JsonConvert.SerializeObject(x);
             var byteArray = Encoding.UTF8.GetBytes(postData);
@@ -45,7 +40,7 @@ namespace FeelKnitService
             // Get the response.
             var response = request.GetResponse();
             // Display the status.
-            Console.WriteLine(((HttpWebResponse)response).StatusDescription);
+            //Console.WriteLine(((HttpWebResponse)response).StatusDescription);
             // Get the stream containing content returned by the server.
             dataStream = response.GetResponseStream();
             // Open the stream using a StreamReader for easy access.
