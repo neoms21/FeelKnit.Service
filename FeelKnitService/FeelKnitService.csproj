@@ -98,6 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GcmService.cs" />
+    <Compile Include="Model\Response.cs" />
     <Compile Include="Modules\BaseModule.cs" />
     <Compile Include="Modules\CommentsModule.cs" />
     <Compile Include="FeelingsContext.cs" />

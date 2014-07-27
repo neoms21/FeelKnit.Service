@@ -43,6 +43,10 @@ namespace FeelKnitService
         public MongoCollection<Feel> Feels
         {
             get { return Database.GetCollection<Feel>("Feels"); }
+        } 
+        public MongoCollection<Response> Responses
+        {
+            get { return Database.GetCollection<Response>("Responses"); }
         }
 
     }

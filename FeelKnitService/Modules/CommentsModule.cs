@@ -7,6 +7,7 @@ using MongoDB.Bson;
 using MongoDB.Driver.Builders;
 using Nancy;
 using Nancy.ModelBinding;
+using Response = FeelKnitService.Model.Response;
 
 namespace FeelKnitService.Modules
 {
@@ -30,11 +31,11 @@ namespace FeelKnitService.Modules
             Task.Factory.StartNew(() =>
             {
                 var feeling = Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(new ObjectId(feelingId.ToString()))));
-                var commentUsers = feeling.Comments.Select(c => c.User).Where(x => !x.Equals(feeling.UserName)).ToList();
+                var commentUsers = feeling.Comments.Select(c => c.User).Distinct().ToList();
                 var bsonValues = new List<BsonValue>();
                 commentUsers.ForEach(c => bsonValues.Add(BsonValue.Create(c)));
                 var users = Context.Users.Find(Query.In("UserName", bsonValues)).ToList();//.First(u => u.UserName.Equals(feeling.UserName));
-                SendNotification(feeling,comment.User, users);
+                SendNotification(feeling, comment.User, users);
             });
 
             return comment;
@@ -42,7 +43,19 @@ namespace FeelKnitService.Modules
 
         private void SendNotification(Feeling feeling, string user, List<User> users)
         {
-            new GcmService().SendRequest(feeling,user, users);
+            try
+            {
+                new GcmService().SendRequest(feeling, user, users, SaveResponse);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+
+        private void SaveResponse(string response)
+        {
+            Context.Responses.Insert(new Response { ResponseText = response });
         }
     }
 }
