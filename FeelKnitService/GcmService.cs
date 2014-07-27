@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using FeelKnitService.Model;
 using Newtonsoft.Json.Linq;
 
 namespace FeelKnitService
@@ -9,7 +11,7 @@ namespace FeelKnitService
     public class GcmService
     {
 
-        public void SendRequest(string userName, string gcmKey)
+        public void SendRequest(string userNameFromComment, List<User> users)
         {
             // Create a request using a URL that can receive a post. 
             var request = WebRequest.Create("https://android.googleapis.com/gcm/send");
@@ -17,13 +19,13 @@ namespace FeelKnitService
             request.Method = "POST";
 
             var x = new JObject();
-            var arr = new JArray
-            {
-                gcmKey
-            };
-
+            var arr = new JArray();
+            //{
+            //    users
+            //};
+            users.ForEach(u => arr.Add(u.Key));
             x.Add("registration_ids", arr);
-            var data = new JObject { { "message", "Youv'e received comment on your recent feeling from" }, { "user", userName } };
+            var data = new JObject { { "message", "Youv'e received comment on your recent feeling from" }, { "user", userNameFromComment } };
             x.Add("data", data);
             var postData = Newtonsoft.Json.JsonConvert.SerializeObject(x);
             var byteArray = Encoding.UTF8.GetBytes(postData);

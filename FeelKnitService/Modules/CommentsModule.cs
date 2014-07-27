@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FeelKnitService.Model;
@@ -23,17 +24,25 @@ namespace FeelKnitService.Modules
             var comment = this.Bind<Comment>();
             comment.PostedAt = DateTime.UtcNow;
             var modUpdate = Update<Feeling>.Push(p => p.Comments, comment);
-            var feeling = Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(new ObjectId(feelingId.ToString()))));
-            var user = Context.Users.FindAll().First(u => u.UserName.Equals(feeling.UserName));
+
+
             Context.Feelings.Update(Query.EQ("_id", new ObjectId(feelingId)), modUpdate);
-            Task.Factory.StartNew(() => SendNotification(comment.User, user.Key));
+            Task.Factory.StartNew(() =>
+            {
+                var feeling = Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(new ObjectId(feelingId.ToString()))));
+                var commentUsers = feeling.Comments.Select(c => c.User).Where(x => !x.Equals(feeling.UserName)).ToList();
+                var bsonValues = new List<BsonValue>();
+                commentUsers.ForEach(c => bsonValues.Add(BsonValue.Create(c)));
+                var users = Context.Users.Find(Query.In("UserName", bsonValues)).ToList();//.First(u => u.UserName.Equals(feeling.UserName));
+                SendNotification(comment.User, users);
+            });
 
             return comment;
         }
 
-        private void SendNotification(string user, string key)
+        private void SendNotification(string user, List<User> users)
         {
-            new GcmService().SendRequest(user, key);
+            new GcmService().SendRequest(user, users);
         }
     }
 }
