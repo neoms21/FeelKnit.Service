@@ -15,18 +15,15 @@ namespace FeelKnitService
     {
         private Action<string> _action;
 
-        public void SendRequest(Feeling feeling, string userNameFromComment, List<User> users, Action<string> action)
+        public void SendRequest(Feeling feeling, string userNameFromComment, List<User> users, Action<string> action, User feelingUser)
         {
             _action = action;
-            var feelinguser = users.FirstOrDefault(u => u.UserName.Equals(feeling.UserName, StringComparison.OrdinalIgnoreCase));
-            if (feelinguser == null)
-                return;
 
             Task.Factory.StartNew(() =>
-                SendGcmRequest(userNameFromComment, new List<User> { feelinguser },
-                    string.Format("Comment on feeling: '{0}' from {1}", feeling.FeelingText, userNameFromComment)));
-            Task.Factory.StartNew(() => SendGcmRequest(userNameFromComment, users.Where(u => u.UserName != feelinguser.UserName).ToList(),
-                string.Format("Comment on comment")));
+                SendGcmRequest(userNameFromComment, new List<User> { feelingUser },
+                    string.Format("Comment on feeling: '{0}' from ", feeling.FeelingText)));
+
+            Task.Factory.StartNew(() => SendGcmRequest(userNameFromComment, users, string.Format("Comment on comment")));
             //dataStream = response.GetResponseStream();
             //var reader = new StreamReader(dataStream);
             //string responseFromServer = reader.ReadToEnd();
@@ -43,7 +40,7 @@ namespace FeelKnitService
             // Create a request using a URL that can receive a post. 
             try
             {
-                if (users.Count() == 1 && users.First().UserName.Equals(userNameFromComment))
+                if (users.Count() == 1 && users.First().UserName.Equals(userNameFromComment) || !users.Any())
                     return;
                 var request = WebRequest.Create("https://android.googleapis.com/gcm/send");
                 // Set the Method property of the request to POST.

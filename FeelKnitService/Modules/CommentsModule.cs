@@ -31,21 +31,22 @@ namespace FeelKnitService.Modules
             Task.Factory.StartNew(() =>
             {
                 var feeling = Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(new ObjectId(feelingId.ToString()))));
-                var commentUsers = feeling.Comments.Select(c => c.User).Distinct().ToList();
+                var feelingUser = Context.Users.FindOne(Query.EQ("UserName", new BsonString(feeling.UserName)));
+                var commentUsers = feeling.Comments.Select(c => c.User != feeling.UserName).Distinct().ToList();
                 var bsonValues = new List<BsonValue>();
                 commentUsers.ForEach(c => bsonValues.Add(BsonValue.Create(c)));
                 var users = Context.Users.Find(Query.In("UserName", bsonValues)).ToList();//.First(u => u.UserName.Equals(feeling.UserName));
-                SendNotification(feeling, comment.User, users);
+                SendNotification(feeling, comment.User, users, feelingUser);
             });
 
             return comment;
         }
 
-        private void SendNotification(Feeling feeling, string user, List<User> users)
+        private void SendNotification(Feeling feeling, string user, List<User> users, User feelingUser)
         {
             try
             {
-                new GcmService().SendRequest(feeling, user, users, SaveResponse);
+                new GcmService().SendRequest(feeling, user, users, SaveResponse, feelingUser);
             }
             catch (Exception e)
             {
