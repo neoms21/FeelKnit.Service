@@ -6,7 +6,6 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using FeelKnitService.Model;
-using Microsoft.SqlServer.Server;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -23,10 +22,11 @@ namespace FeelKnitService
             if (feelinguser == null)
                 return;
 
-            Task.Factory.StartNew(() => SendGcmRequest(userNameFromComment, new List<User> { feelinguser },
-                string.Format("Comment on feeling: '{0}' from {1}", feeling.FeelingText, userNameFromComment)));
-            Task.Factory.StartNew(() => SendGcmRequest(userNameFromComment, users.Where(u => u.UserName != feelinguser.UserName),
-                string.Format("Comment on comment {0}", userNameFromComment)));
+            Task.Factory.StartNew(() =>
+                SendGcmRequest(userNameFromComment, new List<User> { feelinguser },
+                    string.Format("Comment on feeling: '{0}' from {1}", feeling.FeelingText, userNameFromComment)));
+            Task.Factory.StartNew(() => SendGcmRequest(userNameFromComment, users.Where(u => u.UserName != feelinguser.UserName).ToList(),
+                string.Format("Comment on comment")));
             //dataStream = response.GetResponseStream();
             //var reader = new StreamReader(dataStream);
             //string responseFromServer = reader.ReadToEnd();
@@ -38,11 +38,13 @@ namespace FeelKnitService
             //response.Close();
         }
 
-        private void SendGcmRequest(string userNameFromComment, IEnumerable<User> users, string message)
+        private void SendGcmRequest(string userNameFromComment, List<User> users, string message)
         {
             // Create a request using a URL that can receive a post. 
             try
             {
+                if (users.Count() == 1 && users.First().UserName.Equals(userNameFromComment))
+                    return;
                 var request = WebRequest.Create("https://android.googleapis.com/gcm/send");
                 // Set the Method property of the request to POST.
                 request.Method = "POST";
