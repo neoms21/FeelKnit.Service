@@ -21,9 +21,9 @@ namespace FeelKnitService
 
             Task.Factory.StartNew(() =>
                 SendGcmRequest(userNameFromComment, new List<User> { feelingUser },
-                    string.Format("Comment on feeling: '{0}' from ", feeling.FeelingText)));
+                    string.Format("Comment on feeling: '{0}' from ", feeling.FeelingText), feeling));
 
-            Task.Factory.StartNew(() => SendGcmRequest(userNameFromComment, users, string.Format("Comment on comment")));
+            Task.Factory.StartNew(() => SendGcmRequest(userNameFromComment, users, string.Format("Comment on comment"), feeling));
             //dataStream = response.GetResponseStream();
             //var reader = new StreamReader(dataStream);
             //string responseFromServer = reader.ReadToEnd();
@@ -35,7 +35,7 @@ namespace FeelKnitService
             //response.Close();
         }
 
-        private void SendGcmRequest(string userNameFromComment, List<User> users, string message)
+        private void SendGcmRequest(string userNameFromComment, List<User> users, string message, Feeling feeling)
         {
             // Create a request using a URL that can receive a post. 
             try
@@ -52,8 +52,10 @@ namespace FeelKnitService
                 var data = new JObject
                 {
                     {"message", message},
-                    {"user", userNameFromComment}
+                    {"user", userNameFromComment},
+                    {"feeling", JsonConvert.SerializeObject(feeling)}
                 };
+
                 jsonObject.Add("data", data);
                 var postData = JsonConvert.SerializeObject(jsonObject);
                 var byteArray = Encoding.UTF8.GetBytes(postData);

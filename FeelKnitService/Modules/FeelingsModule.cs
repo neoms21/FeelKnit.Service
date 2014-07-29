@@ -45,14 +45,17 @@ namespace FeelKnitService.Modules
 
         private IEnumerable<Feeling> FindFeelingsForUser(object username)
         {
-            MongoCursor<Feeling> findFeelingsForUser = Context.Feelings.Find(Query.EQ("UserName", new BsonString(username.ToString())));
+
+            var findFeelingsForUser = Context.Feelings.Find(Query.EQ("UserName", new BsonString(username.ToString())));
             return findFeelingsForUser.OrderByDescending(f => f.FeelingDate);
         }
 
-        private IEnumerable<Feeling> FindFeelings(object feel)
+        private IEnumerable<Feeling> FindFeelings(Feeling feeling)
         {
-            var feelText = feel.ToString();
-            return Context.Feelings.Find(Query.EQ("FeelingTextLower", new BsonString(feelText.ToLower())));
+            var query = Query.And(Query.EQ("FeelingTextLower", new BsonString(feeling.FeelingTextLower)),
+                Query.NE("UserName", new BsonString(feeling.UserName)));
+
+            return Context.Feelings.Find(query);
         }
 
         private IEnumerable<Feeling> CreateFeeling()
@@ -60,7 +63,7 @@ namespace FeelKnitService.Modules
             var feeling = this.Bind<Feeling>();
             feeling.FeelingDate = DateTime.UtcNow;//.AddDays(-GetRandom());//.ToString("dd/MMM/yyyy HH:mm:ss");
             Context.Feelings.Insert(feeling);
-            var allFeelings = FindFeelings(feeling.FeelingText).ToList();
+            var allFeelings = FindFeelings(feeling).ToList();
             var currentFeeling = allFeelings.FirstOrDefault(f => f.Id == feeling.Id);
             allFeelings.Remove(currentFeeling);
             return allFeelings;

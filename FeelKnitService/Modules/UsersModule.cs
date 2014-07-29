@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FeelKnitService.Model;
+using MongoDB.Bson;
 using MongoDB.Driver.Builders;
 using Nancy;
 using Nancy.ModelBinding;
@@ -40,11 +41,14 @@ namespace FeelKnitService.Modules
             return false;
         }
 
-        private User CreateUser()
+        private bool CreateUser()
         {
             var user = this.Bind<User>();
-            var x = Context.Users.Insert(user);
-            return user;
+            if (Context.Users.FindOne(Query.EQ("UserName", BsonValue.Create(user.UserName))) != null)
+                return false;
+
+            Context.Users.Insert(user);
+            return true;
         }
     }
 }
