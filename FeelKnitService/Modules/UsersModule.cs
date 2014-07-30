@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using FeelKnitService.Model;
 using MongoDB.Bson;
 using MongoDB.Driver.Builders;
-using Nancy;
 using Nancy.ModelBinding;
 
 namespace FeelKnitService.Modules
@@ -18,6 +16,16 @@ namespace FeelKnitService.Modules
             Post["/"] = r => CreateUser();
             Post["/Verify"] = r => VerfiyUser();
             Post["/clientkey"] = r => SaveKey();
+            Post["/clearkey"] = r => ClearKey();
+        }
+
+        private dynamic ClearKey()
+        {
+            var user = this.Bind<User>();
+            var dbUser = Context.Users.FindOne(Query<User>.EQ(u => u.UserName, user.UserName));
+            dbUser.Key = string.Empty;
+            Context.Users.Save(dbUser);
+            return user;
         }
 
         private bool SaveKey()
