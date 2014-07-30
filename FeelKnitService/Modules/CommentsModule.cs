@@ -31,8 +31,8 @@ namespace FeelKnitService.Modules
             Task.Factory.StartNew(() =>
             {
                 var feeling = Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(new ObjectId(feelingId.ToString()))));
-                var feelingUser = Context.Users.FindOne(Query.EQ("UserName", new BsonString(feeling.UserName)));
-                var commentUsers = feeling.Comments.Select(c => c.User != feeling.UserName).Distinct().ToList();
+                var feelingUser = Context.Users.FindOne(Query.EQ("UserName", new BsonString(feeling.UserName))); //prits
+                var commentUsers = feeling.Comments.Select(c => c.User).Where(x => x != feeling.UserName).Distinct().ToList(); //neo
                 var bsonValues = new List<BsonValue>();
                 commentUsers.ForEach(c => bsonValues.Add(BsonValue.Create(c)));
                 var users = Context.Users.Find(Query.In("UserName", bsonValues)).ToList();//.First(u => u.UserName.Equals(feeling.UserName));
