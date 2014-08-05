@@ -17,10 +17,19 @@ namespace FeelKnitService.Modules
             Get["/"] = r => AllFeelings();
             Get["/{feel}"] = r => FindFeelings(r.feel);
             Get["/username/{username}"] = r => FindFeelingsForUser(r.username);
+            Get["/comments/{username}"] = r => FindFeelingsForCommentsUser(r.username);
 
             Post["/"] = r => CreateFeeling();
             Post["/support/{feelingId}"] = r => IncreaseSupportCount(r.feelingId);
             Post["/createfeel/"] = r => CreateFeels();
+        }
+
+        private IEnumerable<Feeling> FindFeelingsForCommentsUser(object username)
+        {
+            var commentQuery = Query<Comment>.EQ(pr => pr.User, Convert.ToString(username));
+            var finalQuery = Query<Feeling>.ElemMatch(p => p.Comments, builder => commentQuery);
+
+            return Context.Feelings.Find(finalQuery).OrderByDescending(f => f.FeelingDate);
         }
 
         private object IncreaseSupportCount(object feelingId)
