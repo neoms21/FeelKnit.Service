@@ -15,7 +15,7 @@ namespace FeelKnitService.Modules
             : base("/feelings")
         {
             Get["/"] = r => AllFeelings();
-            Get["/{feel}"] = r => FindFeelings(r.feel);
+            Get["/relatedfeelings"] = r => FindFeelings();
             Get["/username/{username}"] = r => FindFeelingsForUser(r.username);
             Get["/comments/{username}"] = r => FindFeelingsForCommentsUser(r.username);
 
@@ -54,7 +54,6 @@ namespace FeelKnitService.Modules
 
         private IEnumerable<Feeling> FindFeelingsForUser(object username)
         {
-
             var findFeelingsForUser = Context.Feelings.Find(Query.EQ("UserName", new BsonString(username.ToString())));
             return findFeelingsForUser.OrderByDescending(f => f.FeelingDate);
         }
@@ -64,7 +63,20 @@ namespace FeelKnitService.Modules
             var query = Query.And(Query.EQ("FeelingTextLower", new BsonString(feeling.FeelingTextLower)),
                 Query.NE("UserName", new BsonString(feeling.UserName)));
 
-            return Context.Feelings.Find(query);
+            var relatedFeelings = Context.Feelings.Find(query).OrderBy(f => f.FeelingDate);
+            var groupedFeelings = relatedFeelings.GroupBy(f => f.UserName);
+            var finalFeelings = groupedFeelings.Select(groupedFeeling => groupedFeeling.First()).ToList();
+
+            return finalFeelings;
+        }
+
+        private IEnumerable<Feeling> FindFeelings()
+        {
+            var feeling = Request.Query.feeling;
+            var username = Request.Query.username;
+            var query = Query.And(Query.EQ("FeelingTextLower", new BsonString(feeling)), Query.NE("UserName", new BsonString(username)));
+
+            return Context.Feelings.Find(query).SetSortOrder(SortBy.Descending("feelingDate"));
         }
 
         private IEnumerable<Feeling> CreateFeeling()
