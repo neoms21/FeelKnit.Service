@@ -15,15 +15,15 @@ namespace FeelKnitService
     {
         private Action<string> _action;
 
-        public void SendRequest(Feeling feeling, string userNameFromComment, List<User> users, Action<string> action, User feelingUser)
+        public void SendRequest(Feeling feeling, Comment comment, List<User> users, Action<string> action, User feelingUser)
         {
             _action = action;
 
             Task.Factory.StartNew(() =>
-                SendGcmRequest(userNameFromComment, new List<User> { feelingUser },
-                    string.Format("Comment on feeling: '{0}' from ", feeling.FeelingText), feeling));
+                SendGcmRequest(comment.User, new List<User> { feelingUser },
+                    string.Format("Comment '{0}' on feeling: '{1}' from ", comment.Text, feeling.FeelingText), feeling));
 
-            Task.Factory.StartNew(() => SendGcmRequest(userNameFromComment, users, string.Format("Comment on comment"), feeling));
+            Task.Factory.StartNew(() => SendGcmRequest(comment.User, users, string.Format("Comment '{0}' on comment", comment.Text), feeling));
             //dataStream = response.GetResponseStream();
             //var reader = new StreamReader(dataStream);
             //string responseFromServer = reader.ReadToEnd();

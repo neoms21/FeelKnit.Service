@@ -36,17 +36,17 @@ namespace FeelKnitService.Modules
                 var bsonValues = new List<BsonValue>();
                 commentUsers.ForEach(c => bsonValues.Add(BsonValue.Create(c)));
                 var users = Context.Users.Find(Query.In("UserName", bsonValues)).ToList();//.First(u => u.UserName.Equals(feeling.UserName));
-                SendNotification(feeling, comment.User, users, feelingUser);
+                SendNotification(feeling, comment, users, feelingUser);
             });
 
             return comment;
         }
 
-        private void SendNotification(Feeling feeling, string user, List<User> users, User feelingUser)
+        private void SendNotification(Feeling feeling, Comment comment, List<User> users, User feelingUser)
         {
             try
             {
-                new GcmService().SendRequest(feeling, user, users, SaveResponse, feelingUser);
+                new GcmService().SendRequest(feeling, comment, users, SaveResponse, feelingUser);
             }
             catch (Exception e)
             {
