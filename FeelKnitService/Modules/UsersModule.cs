@@ -49,14 +49,14 @@ namespace FeelKnitService.Modules
             return false;
         }
 
-        private bool CreateUser()
+        private string CreateUser()
         {
             var user = this.Bind<User>();
             if (Context.Users.FindOne(Query.EQ("UserName", BsonValue.Create(user.UserName))) != null)
-                return false;
+                return "Failure";
 
             Context.Users.Insert(user);
-            return true;
+            return "true";
         }
     }
 }

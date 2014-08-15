@@ -98,10 +98,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GcmService.cs" />
+    <Compile Include="Helpers\EmailHelper.cs" />
     <Compile Include="Model\Response.cs" />
     <Compile Include="Modules\BaseModule.cs" />
     <Compile Include="Modules\CommentsModule.cs" />
     <Compile Include="FeelingsContext.cs" />
+    <Compile Include="Modules\EmailModule.cs" />
     <Compile Include="Modules\FeelingsModule.cs" />
     <Compile Include="Model\Comment.cs" />
     <Compile Include="Model\Feeling.cs" />

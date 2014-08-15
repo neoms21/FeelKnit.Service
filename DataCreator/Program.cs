@@ -68,7 +68,8 @@ namespace DataCreator
         {
             _javaScriptSerializer = new JavaScriptSerializer();
             //_jsonString = javaScriptSerializer.Serialize(new User { User = "xyz", Password = "welcome1", EmailAddress = "ksjdf@fkjsd.com" });
-
+         //   new EmailHelper().SendEmail();
+            return;
             CreateFeels();
             //CreateUsers();
             //CreateFeelings();
