@@ -25,6 +25,7 @@ namespace FeelKnitService.Helpers
             message.IsBodyHtml = true;
             message.Body = string.Format("FeelingId {0} has been reported by {1}", feelingId, username);
             message.To.Add("neoms21@gmail.com");
+            message.To.Add("sanket.mali@gmail.com");
 
             try
             {

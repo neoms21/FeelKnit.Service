@@ -7,7 +7,7 @@ namespace FeelKnitService.Modules
         public EmailModule()
             : base("/email")
         {
-            Post["/report/"] = r => ReportFeeling();
+            Post["/report"] = r => ReportFeeling();
         }
 
         private object ReportFeeling()
