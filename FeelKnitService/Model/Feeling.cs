@@ -15,7 +15,9 @@ namespace FeelKnitService.Model
         {
             Location = new double[2];
             Comments = new List<Comment>();
+            SupportUsers = new List<string>();
         }
+
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
@@ -44,6 +46,8 @@ namespace FeelKnitService.Model
         public double[] Location { get; set; }
 
         public IList<Comment> Comments { get; set; }
+        
+        public IList<string> SupportUsers { get; set; }
 
         public double Latitude
         {

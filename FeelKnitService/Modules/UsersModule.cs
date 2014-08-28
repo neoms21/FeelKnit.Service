@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using FeelKnitService.Helpers;
 using FeelKnitService.Model;
 using MongoDB.Bson;
 using MongoDB.Driver.Builders;
@@ -41,12 +43,11 @@ namespace FeelKnitService.Modules
         private bool VerfiyUser()
         {
             var user = this.Bind<User>();
-
             var dbUser = Context.Users.Find(Query<User>.EQ(u => u.UserName, user.UserName)).FirstOrDefault();
-            if (dbUser != null && dbUser.Password.Equals(user.Password))
-                return true;
+            if (dbUser == null) return false;
 
-            return false;
+            var hashedPassword = string.Format("sha1:{0}:{1}:{2}", PasswordHash.PBKDF2_ITERATIONS, dbUser.PasswordSalt, dbUser.Password);
+            return PasswordHash.ValidatePassword(user.Password, hashedPassword);
         }
 
         private string CreateUser()
@@ -54,7 +55,9 @@ namespace FeelKnitService.Modules
             var user = this.Bind<User>();
             if (Context.Users.FindOne(Query.EQ("UserName", BsonValue.Create(user.UserName))) != null)
                 return "Failure";
-
+            var hashedPassword = PasswordHash.CreateHash(user.Password).Split(':');
+            user.PasswordSalt = hashedPassword[2];
+            user.Password = hashedPassword[3];
             Context.Users.Insert(user);
             return "true";
         }

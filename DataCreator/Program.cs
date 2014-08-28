@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 using FeelKnitService;
+using FeelKnitService.Helpers;
 using FeelKnitService.Model;
 using Nancy.Json;
 
@@ -67,8 +67,14 @@ namespace DataCreator
         static void Main(string[] args)
         {
             _javaScriptSerializer = new JavaScriptSerializer();
+
+            var hash = PasswordHash.CreateHash("HelloWorld");
+
+            var x = PasswordHash.ValidatePassword("HelloWorld", hash);
+
+
             //_jsonString = javaScriptSerializer.Serialize(new User { User = "xyz", Password = "welcome1", EmailAddress = "ksjdf@fkjsd.com" });
-         //   new EmailHelper().SendEmail();
+            //   new EmailHelper().SendEmail();
             return;
             CreateFeels();
             //CreateUsers();

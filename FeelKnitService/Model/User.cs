@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using System;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace FeelKnitService.Model
@@ -12,8 +13,14 @@ namespace FeelKnitService.Model
 
         public string Password { get; set; }
 
+        public string PasswordSalt { get; set; }
+
         public string EmailAddress { get; set; } 
         
-        public string Key{ get; set; } 
+        public string Key{ get; set; }
+
+        public bool IsTemporary { get; set; }
+
+        public DateTime ExpiryTime { get; set; }
     }
 }

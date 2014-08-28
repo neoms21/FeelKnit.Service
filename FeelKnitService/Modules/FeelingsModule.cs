@@ -21,7 +21,8 @@ namespace FeelKnitService.Modules
             Get["/comments/{username}"] = r => FindFeelingsForCommentsUser(r.username);
 
             Post["/"] = r => CreateFeeling();
-            Post["/support/{feelingId}"] = r => IncreaseSupportCount(r.feelingId);
+            Post["/increasesupport"] = r => IncreaseSupportCount();
+            Post["/decreasesupport"] = r => DecreaseSupportCount();
             Post["/createfeel/"] = r => CreateFeels();
         }
 
@@ -45,11 +46,27 @@ namespace FeelKnitService.Modules
             return Context.Feelings.Find(finalQuery).OrderByDescending(f => f.FeelingDate);
         }
 
-        private object IncreaseSupportCount(object feelingId)
+        private object IncreaseSupportCount()
         {
+            var feelingId = Request.Form["feelingId"];
+            string username = Request.Form["username"].ToString();
             var feeling = Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(new ObjectId(feelingId.ToString()))));
+            var modUpdate = Update<Feeling>.Push(f => f.SupportUsers, username);
             feeling.SupportCount += 1;
             Context.Feelings.Save(feeling);
+            Context.Feelings.Update(Query.EQ("_id", new ObjectId(feelingId)), modUpdate);
+            return "Done";
+        } 
+        
+        private object DecreaseSupportCount()
+        {
+            var feelingId = Request.Form["feelingId"];
+            string username = Request.Form["username"].ToString();
+            var feeling = Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(new ObjectId(feelingId.ToString()))));
+            var modUpdate = Update<Feeling>.Pull(f => f.SupportUsers, username);
+            feeling.SupportCount -= 1;
+            Context.Feelings.Save(feeling);
+            Context.Feelings.Update(Query.EQ("_id", new ObjectId(feelingId)), modUpdate);
             return "Done";
         }
 

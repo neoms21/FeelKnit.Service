@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using FeelKnitService.Model;
 using MongoDB.Bson;
 using MongoDB.Driver.Builders;
-using Nancy;
 using Nancy.ModelBinding;
 using Response = FeelKnitService.Model.Response;
 
@@ -24,18 +23,24 @@ namespace FeelKnitService.Modules
             //var feeling = Context.Feelings.FindOneById(new ObjectId(feelingId));
             var comment = this.Bind<Comment>();
             comment.PostedAt = DateTime.UtcNow;
-            var modUpdate = Update<Feeling>.Push(p => p.Comments, comment);
+            var modUpdate1 = Update<Feeling>.Push(p => p.Comments, comment);
+       
 
-
-            Context.Feelings.Update(Query.EQ("_id", new ObjectId(feelingId)), modUpdate);
-            Task.Factory.StartNew(() =>
+            Context.Feelings.Update(Query.EQ("_id", new ObjectId(feelingId)), modUpdate1);
+            Task.Factory.StartNew(delegate
             {
-                var feeling = Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(new ObjectId(feelingId.ToString()))));
+                var feeling =
+                    Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(new ObjectId(feelingId.ToString()))));
                 var feelingUser = Context.Users.FindOne(Query.EQ("UserName", new BsonString(feeling.UserName))); //prits
-                var commentUsers = feeling.Comments.Select(c => c.User).Where(x => x != feeling.UserName && x != comment.User).Distinct().ToList(); //neo
+                var commentUsers =
+                    feeling.Comments.Select(c => c.User)
+                        .Where(x => x != feeling.UserName && x != comment.User)
+                        .Distinct()
+                        .ToList(); //neo
                 var bsonValues = new List<BsonValue>();
                 commentUsers.ForEach(c => bsonValues.Add(BsonValue.Create(c)));
-                var users = Context.Users.Find(Query.In("UserName", bsonValues)).ToList();//.First(u => u.UserName.Equals(feeling.UserName));
+                var users = Context.Users.Find(Query.In("UserName", bsonValues)).ToList();
+                    //.First(u => u.UserName.Equals(feeling.UserName));
                 SendNotification(feeling, comment, users, feelingUser);
             });
 
