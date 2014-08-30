@@ -68,7 +68,9 @@ namespace DataCreator
         {
             _javaScriptSerializer = new JavaScriptSerializer();
 
-            var hash = PasswordHash.CreateHash("HelloWorld");
+            var hash = PasswordHash.CreateHash("km");
+
+            var splits = hash.Split(':');
 
             var x = PasswordHash.ValidatePassword("HelloWorld", hash);
 

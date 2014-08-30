@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using FeelKnitService.Model;
 using MongoDB.Bson;
-using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using Nancy.ModelBinding;
 
