@@ -53,6 +53,7 @@ namespace FeelKnitService.Modules
         private string CreateUser()
         {
             var user = this.Bind<User>();
+            user.UserName = user.UserName.Trim();
             if (Context.Users.FindOne(Query.EQ("UserName", BsonValue.Create(user.UserName))) != null)
                 return "Failure";
             var hashedPassword = PasswordHash.CreateHash(user.Password).Split(':');
