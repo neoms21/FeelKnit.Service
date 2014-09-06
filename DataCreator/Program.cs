@@ -8,6 +8,9 @@ using FeelKnitService;
 using FeelKnitService.Helpers;
 using FeelKnitService.Model;
 using Nancy.Json;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Formatting = System.Xml.Formatting;
 
 namespace DataCreator
 {
@@ -68,17 +71,22 @@ namespace DataCreator
         {
             _javaScriptSerializer = new JavaScriptSerializer();
 
-            var hash = PasswordHash.CreateHash("km");
+            var jsonSerializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
+            string json = JsonConvert.SerializeObject(new Feeling { FeelingText = "sdfsdf" }, Newtonsoft.Json.Formatting.Indented, jsonSerializerSettings);
+            Console.WriteLine(json);
+            //var hash = PasswordHash.CreateHash("km");
 
-            var splits = hash.Split(':');
+            //var splits = hash.Split(':');
 
-            var x = PasswordHash.ValidatePassword("HelloWorld", hash);
+            //var x = PasswordHash.ValidatePassword("HelloWorld", hash);
 
 
             //_jsonString = javaScriptSerializer.Serialize(new User { User = "xyz", Password = "welcome1", EmailAddress = "ksjdf@fkjsd.com" });
             //   new EmailHelper().SendEmail();
-            return;
-            CreateFeels();
+            //CreateFeels();
             //CreateUsers();
             //CreateFeelings();
             // CreateComments();

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using FeelKnitService.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace FeelKnitService
 {
@@ -49,11 +50,15 @@ namespace FeelKnitService
                 var arr = new JArray();
                 users.ToList().ForEach(u => arr.Add(u.Key));
                 jsonObject.Add("registration_ids", arr);
+                var jsonSerializerSettings = new JsonSerializerSettings
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                };
                 var data = new JObject
                 {
                     {"message", message},
                     {"user", userNameFromComment},
-                    {"feeling", JsonConvert.SerializeObject(feeling)}
+                    {"feeling", JsonConvert.SerializeObject(feeling, Formatting.Indented, jsonSerializerSettings)}
                 };
 
                 jsonObject.Add("data", data);
