@@ -1,4 +1,6 @@
 ﻿using FeelKnitService.Helpers;
+using MongoDB.Bson;
+using MongoDB.Driver.Builders;
 
 namespace FeelKnitService.Modules
 {
@@ -12,9 +14,12 @@ namespace FeelKnitService.Modules
 
         private object ReportFeeling()
         {
-            var feeling = Request.Form["feelingId"];
+            var feelingId = Request.Form["feelingId"];
+            var feeling = Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(feelingId)));
+            feeling.IsReported = true;
+            Context.Feelings.Save(feeling);
             var username = Request.Form["username"];
-            new EmailHelper().SendEmail(feeling.ToString(), username.ToString());
+            new EmailHelper().SendEmail(feelingId.ToString(), username.ToString());
             return null;
         }
     }

@@ -49,6 +49,8 @@ namespace FeelKnitService.Model
         
         public IList<string> SupportUsers { get; set; }
 
+        public bool IsReported { get; set; }
+
         public double Latitude
         {
             get { return _latitude; }
