@@ -28,7 +28,7 @@ namespace FeelKnitService.Modules
         {
             var user = this.Bind<User>();
             var dbUser = GetUser(user.UserName);
-            SetHashedPassword(dbUser);
+            SetHashedPassword(dbUser, user.Password);
             dbUser.IsTemporary = false;
             dbUser.PasswordExpiryTime = null;
             Context.Users.Save(dbUser);
@@ -92,16 +92,17 @@ namespace FeelKnitService.Modules
             return true;
         }
 
-        private UserVerification VerfiyUser()
+        private bool VerfiyUser()
         {
             var user = this.Bind<User>();
             var dbUser = Context.Users.Find(Query<User>.EQ(u => u.UserName, user.UserName)).FirstOrDefault();
-            if (dbUser == null) return new UserVerification();
+            if (dbUser == null) return false;
 
             var hashedPassword = string.Format("sha1:{0}:{1}:{2}", PasswordHash.PBKDF2_ITERATIONS, dbUser.PasswordSalt, dbUser.Password);
-            var isValidPassword = PasswordHash.ValidatePassword(user.Password, hashedPassword) &&
-                (dbUser.PasswordExpiryTime == null || DateTime.UtcNow < dbUser.PasswordExpiryTime);
-            return new UserVerification { IsTemporary = dbUser.IsTemporary, IsValid = isValidPassword };
+            return PasswordHash.ValidatePassword(user.Password, hashedPassword);
+            //var isValidPassword = PasswordHash.ValidatePassword(user.Password, hashedPassword) &&
+            //    (dbUser.PasswordExpiryTime == null || DateTime.UtcNow < dbUser.PasswordExpiryTime);
+            //return new UserVerification { IsTemporary = dbUser.IsTemporary, IsValid = isValidPassword };
         }
 
         private string CreateUser()
@@ -115,9 +116,9 @@ namespace FeelKnitService.Modules
             return "true";
         }
 
-        private static void SetHashedPassword(User user)
+        private static void SetHashedPassword(User user, string password = "")
         {
-            var hashedPassword = PasswordHash.CreateHash(user.Password).Split(':');
+            var hashedPassword = PasswordHash.CreateHash(string.IsNullOrEmpty(password) ? user.Password : password).Split(':');
             user.PasswordSalt = hashedPassword[2];
             user.Password = hashedPassword[3];
         }
