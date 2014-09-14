@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Net;
 using System.Net.Mail;
 
@@ -8,6 +10,12 @@ namespace FeelKnitService.Helpers
     {
 
         public void SendEmail(string feelingId, string username)
+        {
+            Send("Feeling Reported!!", string.Format("FeelingId {0} has been reported by {1}", feelingId, username),
+                "neoms21@gmail.com", "sanket.mali@gmail.com");
+        }
+
+        public static void Send(string subject, string msg, params string[] toAdd)
         {
             var smtpClient = new SmtpClient();
             var basicCredential = new NetworkCredential("highgroundfeelknit@gmail.com", "feelknitt");
@@ -20,22 +28,30 @@ namespace FeelKnitService.Helpers
             smtpClient.EnableSsl = true;
 
             message.From = fromAddress;
-            message.Subject = "Feeling Reported!!";
+            message.DeliveryNotificationOptions = DeliveryNotificationOptions.OnFailure;
+            message.Subject = subject;
             //Set IsBodyHtml to true means you can send HTML email.
             message.IsBodyHtml = true;
-            message.Body = string.Format("FeelingId {0} has been reported by {1}", feelingId, username);
-            message.To.Add("neoms21@gmail.com");
-            message.To.Add("sanket.mali@gmail.com");
-
+            message.Body = msg;
+            foreach (var address in toAdd)
+            {
+                message.To.Add(address);
+            }
             try
             {
-                smtpClient.Send(message);
+                smtpClient.SendCompleted += smtpClient_SendCompleted;
+                smtpClient.SendAsync(message, null);
             }
             catch (Exception ex)
             {
                 //Error, could not send the message
                 Console.WriteLine(ex.ToString());
             }
+        }
+
+        private static void smtpClient_SendCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            Console.WriteLine(e.Error);
         }
     }
 }

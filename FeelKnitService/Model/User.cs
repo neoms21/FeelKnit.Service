@@ -21,6 +21,6 @@ namespace FeelKnitService.Model
 
         public bool IsTemporary { get; set; }
 
-        public DateTime ExpiryTime { get; set; }
+        public DateTime? PasswordExpiryTime { get; set; }
     }
 }

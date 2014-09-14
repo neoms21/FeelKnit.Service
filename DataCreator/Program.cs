@@ -69,14 +69,14 @@ namespace DataCreator
 
         static void Main(string[] args)
         {
-            _javaScriptSerializer = new JavaScriptSerializer();
+            //_javaScriptSerializer = new JavaScriptSerializer();
 
-            var jsonSerializerSettings = new JsonSerializerSettings
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
-            };
-            string json = JsonConvert.SerializeObject(new Feeling { FeelingText = "sdfsdf" }, Newtonsoft.Json.Formatting.Indented, jsonSerializerSettings);
-            Console.WriteLine(json);
+            //var jsonSerializerSettings = new JsonSerializerSettings
+            //{
+            //    ContractResolver = new CamelCasePropertyNamesContractResolver()
+            //};
+            //string json = JsonConvert.SerializeObject(new Feeling { FeelingText = "sdfsdf" }, Newtonsoft.Json.Formatting.Indented, jsonSerializerSettings);
+            //Console.WriteLine(json);
             //var hash = PasswordHash.CreateHash("km");
 
             //var splits = hash.Split(':');
@@ -85,7 +85,7 @@ namespace DataCreator
 
 
             //_jsonString = javaScriptSerializer.Serialize(new User { User = "xyz", Password = "welcome1", EmailAddress = "ksjdf@fkjsd.com" });
-            //   new EmailHelper().SendEmail();
+            EmailHelper.Send("sdfs", "sdfs", "sdfjks@as.com");
             //CreateFeels();
             //CreateUsers();
             //CreateFeelings();

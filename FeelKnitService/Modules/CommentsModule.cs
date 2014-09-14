@@ -24,7 +24,6 @@ namespace FeelKnitService.Modules
             var comment = this.Bind<Comment>();
             comment.PostedAt = DateTime.UtcNow;
             var modUpdate1 = Update<Feeling>.Push(p => p.Comments, comment);
-       
 
             Context.Feelings.Update(Query.EQ("_id", new ObjectId(feelingId)), modUpdate1);
             Task.Factory.StartNew(delegate

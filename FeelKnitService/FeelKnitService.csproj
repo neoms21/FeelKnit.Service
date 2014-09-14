@@ -101,6 +101,7 @@
     <Compile Include="Helpers\EmailHelper.cs" />
     <Compile Include="Helpers\PasswordHash.cs" />
     <Compile Include="Model\Response.cs" />
+    <Compile Include="Model\UserVerification.cs" />
     <Compile Include="Modules\BaseModule.cs" />
     <Compile Include="Modules\CommentsModule.cs" />
     <Compile Include="FeelingsContext.cs" />
