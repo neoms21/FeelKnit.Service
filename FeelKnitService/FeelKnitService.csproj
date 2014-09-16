@@ -99,6 +99,7 @@
   <ItemGroup>
     <Compile Include="GcmService.cs" />
     <Compile Include="Helpers\EmailHelper.cs" />
+    <Compile Include="Helpers\ListExtensions.cs" />
     <Compile Include="Helpers\PasswordHash.cs" />
     <Compile Include="Model\Response.cs" />
     <Compile Include="Model\UserVerification.cs" />

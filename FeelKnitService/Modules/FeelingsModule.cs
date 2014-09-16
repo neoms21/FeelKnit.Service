@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FeelKnitService.Helpers;
 using FeelKnitService.Model;
 using MongoDB.Bson;
 using MongoDB.Driver.Builders;
@@ -23,7 +24,27 @@ namespace FeelKnitService.Modules
             Post["/increasesupport"] = r => IncreaseSupportCount();
             Post["/decreasesupport"] = r => DecreaseSupportCount();
             Post["/createfeel/"] = r => CreateFeels();
+            //Post["/updatefeelings"] = r => UpdateFeelings();
         }
+
+        //private bool UpdateFeelings()
+        //{
+        //    var feelings = Context.Feelings.FindAll().OrderByDescending(f => f.FeelingDate);
+
+        //    var groupedfeelings = feelings.GroupBy(f => f.UserName);
+
+        //    foreach (var groupedfeeling in groupedfeelings)
+        //    {
+        //        var i = 0; ;
+        //        foreach (var feeling in groupedfeeling)
+        //        {
+        //            feeling.IsCurrentFeeling = i == 0;
+        //            i++;
+        //            Context.Feelings.Save(feeling);
+        //        }
+        //    }
+        //    return true;
+        //}
 
         private Feeling FindUserFeeling()
         {
@@ -90,6 +111,7 @@ namespace FeelKnitService.Modules
         private IEnumerable<Feeling> FindFeelings(Feeling feeling)
         {
             var query = Query.And(Query.EQ("FeelingTextLower", new BsonString(feeling.FeelingTextLower)),
+                Query.EQ("IsCurrentFeeling", new BsonBoolean(true)),
                 Query.NE("UserName", new BsonString(feeling.UserName)));
 
             var relatedFeelings = Context.Feelings.Find(query);
@@ -110,8 +132,11 @@ namespace FeelKnitService.Modules
 
         private IEnumerable<Feeling> CreateFeeling()
         {
+
             var feeling = this.Bind<Feeling>();
+            Context.Feelings.Find(Query.EQ("UserName", new BsonString(feeling.UserName))).ForEach(f => f.IsCurrentFeeling = false);
             feeling.FeelingDate = DateTime.UtcNow;//.AddDays(-GetRandom());//.ToString("dd/MMM/yyyy HH:mm:ss");
+            feeling.IsCurrentFeeling = true;
             Context.Feelings.Insert(feeling);
             var allFeelings = FindFeelings(feeling).ToList();
             var currentFeeling = allFeelings.FirstOrDefault(f => f.Id == feeling.Id);

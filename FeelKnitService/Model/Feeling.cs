@@ -50,6 +50,8 @@ namespace FeelKnitService.Model
         public IList<string> SupportUsers { get; set; }
 
         public bool IsReported { get; set; }
+        
+        public bool IsCurrentFeeling { get; set; }
 
         public double Latitude
         {
