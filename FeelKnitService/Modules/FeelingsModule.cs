@@ -14,7 +14,7 @@ namespace FeelKnitService.Modules
             : base("/feelings")
         {
             Get["/"] = r => AllFeelings();
-            Get["/relatedfeelings"] = r => FindFeelings();
+            //Get["/relatedfeelings"] = r => FindFeelings();
             Get["/userfeelings"] = r => FindUserFeeling();
             Get["/username/{username}"] = r => FindFeelingsForUser(r.username);
             Get["/comments/{username}"] = r => FindFeelingsForCommentsUser(r.username);
@@ -55,8 +55,8 @@ namespace FeelKnitService.Modules
             Context.Feelings.Save(feeling);
             Context.Feelings.Update(Query.EQ("_id", new ObjectId(feelingId)), modUpdate);
             return "Done";
-        } 
-        
+        }
+
         private object DecreaseSupportCount()
         {
             var feelingId = Request.Form["feelingId"];
@@ -92,21 +92,21 @@ namespace FeelKnitService.Modules
             var query = Query.And(Query.EQ("FeelingTextLower", new BsonString(feeling.FeelingTextLower)),
                 Query.NE("UserName", new BsonString(feeling.UserName)));
 
-            var relatedFeelings = Context.Feelings.Find(query).OrderBy(f => f.FeelingDate);
-            var groupedFeelings = relatedFeelings.GroupBy(f => f.UserName);
+            var relatedFeelings = Context.Feelings.Find(query);
+            var groupedFeelings = relatedFeelings.OrderByDescending(f => f.FeelingDate).GroupBy(f => f.UserName);
             var finalFeelings = groupedFeelings.Select(groupedFeeling => groupedFeeling.First()).ToList();
 
             return finalFeelings;
         }
 
-        private IEnumerable<Feeling> FindFeelings()
-        {
-            var feeling = Request.Query.feeling;
-            var username = Request.Query.username;
-            var query = Query.And(Query.EQ("FeelingTextLower", new BsonString(feeling)), Query.NE("UserName", new BsonString(username)));
+        //private IEnumerable<Feeling> FindFeelings()
+        //{
+        //    var feeling = Request.Query.feeling;
+        //    var username = Request.Query.username;
+        //    var query = Query.And(Query.EQ("FeelingTextLower", new BsonString(feeling)), Query.NE("UserName", new BsonString(username)));
 
-            return Context.Feelings.Find(query).SetSortOrder(SortBy.Descending("feelingDate"));
-        }
+        //    return Context.Feelings.Find(query).SetSortOrder(SortBy.Descending("feelingDate"));
+        //  }
 
         private IEnumerable<Feeling> CreateFeeling()
         {
