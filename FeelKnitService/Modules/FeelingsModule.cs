@@ -4,6 +4,7 @@ using System.Linq;
 using FeelKnitService.Helpers;
 using FeelKnitService.Model;
 using MongoDB.Bson;
+using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using Nancy.ModelBinding;
 
@@ -134,8 +135,10 @@ namespace FeelKnitService.Modules
         {
 
             var feeling = this.Bind<Feeling>();
-            Context.Feelings.Find(Query.EQ("UserName", new BsonString(feeling.UserName))).ForEach(f => f.IsCurrentFeeling = false);
-            feeling.FeelingDate = DateTime.UtcNow;//.AddDays(-GetRandom());//.ToString("dd/MMM/yyyy HH:mm:ss");
+            var query = Query.And(Query.EQ("UserName", new BsonString(feeling.UserName)), Query.EQ("IsCurrentFeeling", new BsonBoolean(true)));
+            var update = Update.Set("IsCurrentFeeling", new BsonBoolean(false));
+            Context.Feelings.Update(query, update, UpdateFlags.Multi);
+            feeling.FeelingDate = DateTime.UtcNow;
             feeling.IsCurrentFeeling = true;
             Context.Feelings.Insert(feeling);
             var allFeelings = FindFeelings(feeling).ToList();
