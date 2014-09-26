@@ -30,6 +30,11 @@ namespace FeelKnitService
         }
 
 
+        public MongoCollection<ApplicationSetting> ApplicationSettings
+        {
+            get { return Database.GetCollection<ApplicationSetting>("ApplicationSettings"); }
+        } 
+        
         public MongoCollection<User> Users
         {
             get { return Database.GetCollection<User>("Users"); }
@@ -57,5 +62,7 @@ namespace FeelKnitService
         public string Id { get; set; }
 
         public string Text { get; set; }
+
+        public int Rank { get; set; }
     }
 }

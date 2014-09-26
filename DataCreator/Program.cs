@@ -20,23 +20,20 @@ namespace DataCreator
 
         private static readonly List<int> ConsumedRandoms = new List<int>();
         //private static string _jsonString = "";//@"{""object"":{""name"":""Name""}}";
-        private static string[] _feelings =
-        {
-            "Happy",
-            "Sad",
-            "Blessed",
-            "Proud",
-            "Ashamed",
-            "Worried",
-            "Scared",
-            "Lonely",
-            "Excited",
-            "Relieved",
-            "Pampered",
-            "Sick",
-            "Loved",
-            "Embarrased",
-            "Frustrated"
+        private static List<Tuple<string, int>> _feelings = new List<Tuple<string, int>>{
+            new Tuple<string,int>("Happy",1),
+            new Tuple<string,int>("Sad",2),
+            new Tuple<string,int>("Proud",3),
+            new Tuple<string,int>("Blessed",4),
+            new Tuple<string,int>("Worried",5),
+            new Tuple<string,int>("Frustrated",6),
+            new Tuple<string,int>("Lonely",7),
+            new Tuple<string,int>("Relieved",8),
+            new Tuple<string,int>("Sick",9),
+            new Tuple<string,int>("Loved",10),
+            new Tuple<string,int>("Embarassed",11),
+            new Tuple<string,int>("Ashamed",12),
+            new Tuple<string,int>("Scared",13),
         };
 
         private static List<Tuple<double, double>> _locations = new List<Tuple<double, double>>
@@ -70,9 +67,9 @@ namespace DataCreator
         static void Main(string[] args)
         {
 
-           // var feelings = 
+            // var feelings = 
 
-            //_javaScriptSerializer = new JavaScriptSerializer();
+            _javaScriptSerializer = new JavaScriptSerializer();
 
             //var jsonSerializerSettings = new JsonSerializerSettings
             //{
@@ -88,14 +85,22 @@ namespace DataCreator
 
 
             //_jsonString = javaScriptSerializer.Serialize(new User { User = "xyz", Password = "welcome1", EmailAddress = "ksjdf@fkjsd.com" });
-           // EmailHelper.Send("sdfs", "sdfs", "sdfjks@as.com");
+            // EmailHelper.Send("sdfs", "sdfs", "sdfjks@as.com");
             //CreateFeels();
             //CreateUsers();
             //CreateFeelings();
             // CreateComments();
+            CreateApplicationSettings();
             Console.WriteLine("Done!!!!");
             Console.ReadLine();
             // PostRequest(jsonString, URL);
+        }
+
+        private static void CreateApplicationSettings()
+        {
+            
+            FeelingsContext context = new FeelingsContext();
+            context.ApplicationSettings.Insert(new ApplicationSetting {FeelingsUpdated = true});
         }
 
         private static void CreateFeels()
@@ -104,7 +109,8 @@ namespace DataCreator
             {
                 var feeling = new Feel
                 {
-                    Text = f
+                    Text = f.Item1,
+                    Rank = f.Item2
                 };
                 PostRequest(_javaScriptSerializer.Serialize(feeling), "http://localhost/FeelKnitService/feelings/createfeel");
             }
@@ -153,27 +159,27 @@ namespace DataCreator
             }
         }
 
-        private static void CreateFeelings()
-        {
-            for (var i = 1; i < 201; i++)
-            {
-                var index = new Random().Next(1, _locations.Count);
-                var feeling = new Feeling
-                {
-                    FeelingText = _feelings[GetRandom(_feelings.Count())],
-                    FeelingDate = DateTime.UtcNow.AddDays(-new Random().Next(1, 11)),
-                    UserName = "User" + new Random().Next(1, 11),
-                    Reason = "reason for feeling",
-                    Action = "action for feeling",
-                    Longitude = _locations[index].Item2,
-                    Latitude = _locations[index].Item1,
-                    Comments = new List<Comment>()
-                };
-                CreateComments(feeling);
-                PostRequest(_javaScriptSerializer.Serialize(feeling), "http://localhost/FeelKnitService/feelings");
-                Console.WriteLine("Feeling num {0} created", i);
-            }
-        }
+        //private static void CreateFeelings()
+        //{
+        //    for (var i = 1; i < 201; i++)
+        //    {
+        //        var index = new Random().Next(1, _locations.Count);
+        //        var feeling = new Feeling
+        //        {
+        //            FeelingText = _feelings[GetRandom(_feelings.Count())],
+        //            FeelingDate = DateTime.UtcNow.AddDays(-new Random().Next(1, 11)),
+        //            UserName = "User" + new Random().Next(1, 11),
+        //            Reason = "reason for feeling",
+        //            Action = "action for feeling",
+        //            Longitude = _locations[index].Item2,
+        //            Latitude = _locations[index].Item1,
+        //            Comments = new List<Comment>()
+        //        };
+        //        CreateComments(feeling);
+        //        PostRequest(_javaScriptSerializer.Serialize(feeling), "http://localhost/FeelKnitService/feelings");
+        //        Console.WriteLine("Feeling num {0} created", i);
+        //    }
+        //}
 
         private static void CreateUsers()
         {

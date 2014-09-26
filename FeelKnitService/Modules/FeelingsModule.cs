@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FeelKnitService.Helpers;
 using FeelKnitService.Model;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
+using MongoDB.Driver.Linq;
 using Nancy.ModelBinding;
 
 namespace FeelKnitService.Modules
@@ -20,12 +20,19 @@ namespace FeelKnitService.Modules
             Get["/userfeelings"] = r => FindUserFeeling();
             Get["/username/{username}"] = r => FindFeelingsForUser(r.username);
             Get["/comments/{username}"] = r => FindFeelingsForCommentsUser(r.username);
+            Get["/getfeels"] = r => Fetchfeels();
 
             Post["/"] = r => CreateFeeling();
             Post["/increasesupport"] = r => IncreaseSupportCount();
             Post["/decreasesupport"] = r => DecreaseSupportCount();
             Post["/createfeel/"] = r => CreateFeels();
             //Post["/updatefeelings"] = r => UpdateFeelings();
+        }
+
+        private IEnumerable<string> Fetchfeels()
+        {
+            var feels = Context.Feels.AsQueryable();
+            return feels.OrderBy(x => x.Rank).Select(x => x.Text);
         }
 
         //private bool UpdateFeelings()
