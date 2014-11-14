@@ -18,6 +18,8 @@ namespace FeelKnitService.Model
         public string EmailAddress { get; set; } 
         
         public string Key{ get; set; }
+        
+        public string Avatar{ get; set; }
 
         public bool IsTemporary { get; set; }
 

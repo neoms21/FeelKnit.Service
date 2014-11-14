@@ -24,7 +24,9 @@ namespace FeelKnitService
                 SendGcmRequest(comment.User, new List<User> { feelingUser },
                     string.Format("Comment '{0}' on feeling: '{1}' from ", comment.Text, feeling.FeelingText), feeling));
 
-            Task.Factory.StartNew(() => SendGcmRequest(comment.User, users, string.Format("Comment '{0}' on comment", comment.Text), feeling));
+            Task.Factory.StartNew(
+                () =>
+                    SendGcmRequest(comment.User, users, string.Format("Comment '{0}' on comment", comment.Text), feeling));
             //dataStream = response.GetResponseStream();
             //var reader = new StreamReader(dataStream);
             //string responseFromServer = reader.ReadToEnd();

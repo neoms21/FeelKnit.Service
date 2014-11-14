@@ -37,6 +37,8 @@ namespace FeelKnitService.Model
 
         public string UserName { get; set; }
 
+        public User User { get; set; }
+
         public string Reason { get; set; }
 
         public string Action { get; set; }

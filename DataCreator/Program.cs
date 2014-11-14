@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using FeelKnitService;
-using FeelKnitService.Helpers;
 using FeelKnitService.Model;
 using Nancy.Json;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using Formatting = System.Xml.Formatting;
 
 namespace DataCreator
 {
@@ -61,15 +60,31 @@ namespace DataCreator
             "What has happened has happened"
         };
 
+        private static List<string> images = new List<string>
+        {
+            "thor",
+            "hulk",
+            "girl1",
+            "girl2",
+            "chef",
+            "blackwidow",
+            "girl3",
+            "ironman",
+            "gru",
+            "eveilminion",
+            "kungfuminion"
+        };
+        private static readonly FeelingsContext _context = new FeelingsContext();
         private static JavaScriptSerializer _javaScriptSerializer;
 
 
         static void Main(string[] args)
         {
-
+            Console.WriteLine(images.Count());
+            FormatFeelings();
             // var feelings = 
 
-            _javaScriptSerializer = new JavaScriptSerializer();
+            // _javaScriptSerializer = new JavaScriptSerializer();
 
             //var jsonSerializerSettings = new JsonSerializerSettings
             //{
@@ -90,17 +105,77 @@ namespace DataCreator
             //CreateUsers();
             //CreateFeelings();
             // CreateComments();
-            CreateApplicationSettings();
+            // CreateApplicationSettings();
+            //CallService();
             Console.WriteLine("Done!!!!");
             Console.ReadLine();
             // PostRequest(jsonString, URL);
         }
 
+        private static void FormatFeelings()
+        {
+            var users = _context.Users.FindAll();
+
+            var feelings = _context.Feelings.FindAll();
+            Console.WriteLine(feelings.Count());
+            var index = 1;
+            //var comments = feelings.SelectMany(x => x.Comments);
+
+            foreach (Feeling feeling in feelings)
+            {
+                var c = feeling.Comments.ToList();
+                index++;
+            }
+
+            Console.WriteLine(index);
+        }
+
+        private static void SetAvatars()
+        {
+
+            var users = _context.Users.FindAll();
+
+            foreach (var user in users)
+            {
+                var randomNumber = GetRandom(11);
+                user.Avatar = images[randomNumber];
+                _context.Users.Save(user);
+            }
+        }
+
+        private async static void CallService()
+        {
+            var httpClient = new HttpClient();
+            string content = JsonConvert.SerializeObject(new User { UserName = "xxx", Password = "yyy" });
+            Console.WriteLine(content);
+            //var response = await httpClient.PostAsync(url, new StringContent(JsonConvert.SerializeObject(obj)));
+
+            //response.EnsureSuccessStatusCode();
+
+            //string content = await response.Content.ReadAsStringAsync();
+            //var resText = await Task.Run(() => JsonConvert.DeserializeObject(content));
+
+            HttpContent cntnt = new StringContent(JsonConvert.SerializeObject(content));
+
+            try
+            {
+                // Send the json to the server using POST
+                Task<HttpResponseMessage> getResponse = httpClient.PostAsync("http://localhost/feelknitservice/users", cntnt);
+                // Wait for the response and read it to a string var
+
+                HttpResponseMessage response = await getResponse;
+                var responseStr = await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error communicating with the server: " + e.Message);
+            }
+
+        }
+
         private static void CreateApplicationSettings()
         {
-            
-            FeelingsContext context = new FeelingsContext();
-            context.ApplicationSettings.Insert(new ApplicationSetting {FeelingsUpdated = true});
+            _context.ApplicationSettings.Insert(new ApplicationSetting { FeelingsUpdated = true });
         }
 
         private static void CreateFeels()
