@@ -22,6 +22,16 @@ namespace FeelKnitService.Modules
             Post["/forgot"] = r => ForgotPassword();
             Post["/updateEmail"] = r => UpdateEmail();
             Post["/updatePassword"] = r => UpdatePassword();
+            Post["/saveAvatar"] = r => UpdateUserAvatar();
+        }
+
+        private bool UpdateUserAvatar()
+        {
+            var user = this.Bind<User>();
+            var dbUser = GetUser(user.UserName);
+            dbUser.Avatar = user.Avatar;
+            Context.Users.Save(dbUser);
+            return true;
         }
 
         private bool UpdatePassword()
@@ -92,14 +102,15 @@ namespace FeelKnitService.Modules
             return true;
         }
 
-        private bool VerfiyUser()
+        private dynamic VerfiyUser()
         {
             var user = this.Bind<User>();
             var dbUser = Context.Users.Find(Query<User>.EQ(u => u.UserName, user.UserName)).FirstOrDefault();
             if (dbUser == null) return false;
 
             var hashedPassword = string.Format("sha1:{0}:{1}:{2}", PasswordHash.PBKDF2_ITERATIONS, dbUser.PasswordSalt, dbUser.Password);
-            return PasswordHash.ValidatePassword(user.Password, hashedPassword);
+            bool isValidPassword = PasswordHash.ValidatePassword(user.Password, hashedPassword);
+            return isValidPassword ? new { IsLoginSuccessful = true, dbUser.Avatar } : new { IsLoginSuccessful = false, Avatar = string.Empty };
             //var isValidPassword = PasswordHash.ValidatePassword(user.Password, hashedPassword) &&
             //    (dbUser.PasswordExpiryTime == null || DateTime.UtcNow < dbUser.PasswordExpiryTime);
             //return new UserVerification { IsTemporary = dbUser.IsTemporary, IsValid = isValidPassword };

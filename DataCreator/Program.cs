@@ -7,9 +7,12 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using FeelKnitService;
+using FeelKnitService.Helpers;
 using FeelKnitService.Model;
 using Nancy.Json;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Formatting = System.Xml.Formatting;
 
 namespace DataCreator
 {
@@ -115,15 +118,43 @@ namespace DataCreator
         private static void FormatFeelings()
         {
             var users = _context.Users.FindAll();
-
-            var feelings = _context.Feelings.FindAll();
+            var feelings = _context.Feelings.FindAll().Where(f => f.User == null).ToList();
             Console.WriteLine(feelings.Count());
             var index = 1;
-            //var comments = feelings.SelectMany(x => x.Comments);
-
-            foreach (Feeling feeling in feelings)
+            var count = 2;
+            foreach (var feeling in feelings)
             {
-                var c = feeling.Comments.ToList();
+                var user = users.FirstOrDefault(u => u.UserName == feeling.UserName);
+                if (user != null)
+                    feeling.User = user;
+
+                _context.Feelings.Save(feeling);
+
+                index++;
+            }
+
+            Console.WriteLine(index);
+        }
+
+        private static void FormatComments()
+        {
+            var users = _context.Users.FindAll();
+            var feelings = _context.Feelings.FindAll().Where(f => f.Comments.Any() && f.Comments.All(c => c.CommentUser == null)).ToList();
+            Console.WriteLine(feelings.Count());
+            var index = 1;
+            var count = 2;
+            foreach (var feeling in feelings)
+            {
+
+                foreach (var comment in feeling.Comments)
+                {
+                    var user = users.FirstOrDefault(u => u.UserName == comment.User);
+                    if (user != null)
+                        comment.CommentUser = user;
+                }
+
+                _context.Feelings.Save(feeling);
+
                 index++;
             }
 
