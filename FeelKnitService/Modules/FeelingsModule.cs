@@ -147,6 +147,8 @@ namespace FeelKnitService.Modules
             Context.Feelings.Update(query, update, UpdateFlags.Multi);
             feeling.FeelingDate = DateTime.UtcNow;
             feeling.IsCurrentFeeling = true;
+            var dbUser = Context.Users.FindOne(Query.EQ("UserName", new BsonString(feeling.UserName)));
+            feeling.User = dbUser;
             Context.Feelings.Insert(feeling);
             var allFeelings = FindFeelings(feeling).ToList();
             var currentFeeling = allFeelings.FirstOrDefault(f => f.Id == feeling.Id);
