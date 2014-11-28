@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FeelKnitService.Model;
@@ -16,17 +17,27 @@ namespace FeelKnitService.Modules
             : base("/feelings")
         {
             Get["/"] = r => AllFeelings();
-            //Get["/relatedfeelings"] = r => FindFeelings();
             Get["/userfeelings"] = r => FindUserFeeling();
             Get["/username/{username}"] = r => FindFeelingsForUser(r.username);
             Get["/comments/{username}"] = r => FindFeelingsForCommentsUser(r.username);
+            Get["/relatedfeelings/{username}"] = r => FindRelatedFeelingsForUser(r.username);
             Get["/getfeels"] = r => Fetchfeels();
 
             Post["/"] = r => CreateFeeling();
             Post["/increasesupport"] = r => IncreaseSupportCount();
             Post["/decreasesupport"] = r => DecreaseSupportCount();
-            Post["/createfeel/"] = r => CreateFeels();
-            //Post["/updatefeelings"] = r => UpdateFeelings();
+        }
+
+        private IEnumerable<Feeling> FindRelatedFeelingsForUser(object username)
+        {
+            var feeling =
+                Context.Feelings.FindOne(Query.And(Query.EQ("UserName", new BsonString(username.ToString())),
+                    Query.EQ("IsCurrentFeeling", new BsonBoolean(true))));
+            if (feeling == null) return null;
+
+            var relatedFeelings = FindFeelings(feeling.FeelingTextLower, feeling.UserName).ToList();
+            relatedFeelings.Insert(0, feeling);
+            return relatedFeelings;
         }
 
         private IEnumerable<string> Fetchfeels()
@@ -34,25 +45,6 @@ namespace FeelKnitService.Modules
             var feels = Context.Feels.AsQueryable();
             return feels.OrderBy(x => x.Rank).Select(x => x.Text);
         }
-
-        //private bool UpdateFeelings()
-        //{
-        //    var feelings = Context.Feelings.FindAll().OrderByDescending(f => f.FeelingDate);
-
-        //    var groupedfeelings = feelings.GroupBy(f => f.UserName);
-
-        //    foreach (var groupedfeeling in groupedfeelings)
-        //    {
-        //        var i = 0; ;
-        //        foreach (var feeling in groupedfeeling)
-        //        {
-        //            feeling.IsCurrentFeeling = i == 0;
-        //            i++;
-        //            Context.Feelings.Save(feeling);
-        //        }
-        //    }
-        //    return true;
-        //}
 
         private Feeling FindUserFeeling()
         {
@@ -98,13 +90,6 @@ namespace FeelKnitService.Modules
             return "Done";
         }
 
-        private object CreateFeels()
-        {
-            var feeling = this.Bind<Feel>();
-            Context.Feels.Insert(feeling);
-            return feeling;
-        }
-
         private IEnumerable<Feeling> AllFeelings()
         {
             return Context.Feelings.FindAll();
@@ -116,11 +101,11 @@ namespace FeelKnitService.Modules
             return findFeelingsForUser.OrderByDescending(f => f.FeelingDate);
         }
 
-        private IEnumerable<Feeling> FindFeelings(Feeling feeling)
+        private IEnumerable<Feeling> FindFeelings(string feelingText, string username)
         {
-            var query = Query.And(Query.EQ("FeelingTextLower", new BsonString(feeling.FeelingTextLower)),
+            var query = Query.And(Query.EQ("FeelingTextLower", new BsonString(feelingText)),
                 Query.EQ("IsCurrentFeeling", new BsonBoolean(true)),
-                Query.NE("UserName", new BsonString(feeling.UserName)));
+                Query.NE("UserName", new BsonString(username)));
 
             var relatedFeelings = Context.Feelings.Find(query);
             var groupedFeelings = relatedFeelings.OrderByDescending(f => f.FeelingDate).GroupBy(f => f.UserName);
@@ -140,7 +125,6 @@ namespace FeelKnitService.Modules
 
         private IEnumerable<Feeling> CreateFeeling()
         {
-
             var feeling = this.Bind<Feeling>();
             var query = Query.And(Query.EQ("UserName", new BsonString(feeling.UserName)), Query.EQ("IsCurrentFeeling", new BsonBoolean(true)));
             var update = Update.Set("IsCurrentFeeling", new BsonBoolean(false));
@@ -150,7 +134,7 @@ namespace FeelKnitService.Modules
             var dbUser = Context.Users.FindOne(Query.EQ("UserName", new BsonString(feeling.UserName)));
             feeling.User = dbUser;
             Context.Feelings.Insert(feeling);
-            var allFeelings = FindFeelings(feeling).ToList();
+            var allFeelings = FindFeelings(feeling.FeelingTextLower, feeling.UserName).ToList();
             var currentFeeling = allFeelings.FirstOrDefault(f => f.Id == feeling.Id);
             allFeelings.Remove(currentFeeling);
             return allFeelings;
