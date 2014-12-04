@@ -44,7 +44,7 @@ namespace FeelKnitService.Push
             //  (so you would leave the first arg in the ctor of ApplePushChannelSettings as 'false')
             //  If you are using an AdHoc or AppStore provisioning profile, you must use the Production push notification server
             //  (so you would change the first arg in the ctor of ApplePushChannelSettings to 'true')
-            _pushBroker.RegisterAppleService(new ApplePushChannelSettings(true, appleCert, "Elys1um")); //Extension method
+            _pushBroker.RegisterAppleService(new ApplePushChannelSettings(false, appleCert, "Elys1um")); //Extension method
         }
 
         public void SendNotification(string deviceToken, string message)

@@ -19,6 +19,8 @@ namespace FeelKnitService.Model
         
         public string Key{ get; set; }
         
+        public string iosKey{ get; set; }
+        
         public string Avatar{ get; set; }
 
         public bool IsTemporary { get; set; }

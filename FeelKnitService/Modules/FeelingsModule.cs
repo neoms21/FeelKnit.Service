@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FeelKnitService.Model;
+using FeelKnitService.Push;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
@@ -42,6 +43,7 @@ namespace FeelKnitService.Modules
 
         private IEnumerable<string> Fetchfeels()
         {
+           // var push = new PushNotificationApple();
             var feels = Context.Feels.AsQueryable();
             return feels.OrderBy(x => x.Rank).Select(x => x.Text);
         }

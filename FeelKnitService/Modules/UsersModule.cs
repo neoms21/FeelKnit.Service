@@ -18,6 +18,7 @@ namespace FeelKnitService.Modules
             Post["/"] = r => CreateUser();
             Post["/Verify"] = r => VerfiyUser();
             Post["/clientkey"] = r => SaveKey();
+            Post["/devicetoken"] = r => SaveAppleToken();
             Post["/clearkey"] = r => ClearKey();
             Post["/forgot"] = r => ForgotPassword();
             Post["/updateEmail"] = r => UpdateEmail();
@@ -25,6 +26,7 @@ namespace FeelKnitService.Modules
             Post["/saveAvatar"] = r => UpdateUserAvatar();
         }
 
+        
         private bool UpdateUserAvatar()
         {
             var user = this.Bind<User>();
@@ -98,6 +100,15 @@ namespace FeelKnitService.Modules
             var user = this.Bind<User>();
             var dbUser = Context.Users.FindOne(Query<User>.EQ(u => u.UserName, user.UserName));
             dbUser.Key = user.Key;
+            Context.Users.Save(dbUser);
+            return true;
+        }
+
+        private bool SaveAppleToken()
+        {
+            var user = this.Bind<User>();
+            var dbUser = Context.Users.FindOne(Query<User>.EQ(u => u.UserName, user.UserName));
+            dbUser.iosKey = user.iosKey;
             Context.Users.Save(dbUser);
             return true;
         }
