@@ -1,22 +1,32 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using FeelKnitService.Helpers;
 using FeelKnitService.Model;
+using JWT;
 using MongoDB.Bson;
 using MongoDB.Driver.Builders;
+using Nancy;
 using Nancy.ModelBinding;
+using Nancy.Responses.Negotiation;
 
 namespace FeelKnitService.Modules
 {
     public class UsersModule : BaseModule
     {
-        public UsersModule()
+        private readonly IConfigProvider _configProvider;
+        private readonly IJwtWrapper _jwtWrapper;
+
+        public UsersModule(IConfigProvider configProvider, IJwtWrapper jwtWrapper)
             : base("/users")
         {
+            _configProvider = configProvider;
+            _jwtWrapper = jwtWrapper;
             Get["/"] = r => new User { UserName = "Manoj" };
 
             Post["/"] = r => CreateUser();
-            Post["/Verify"] = r => VerfiyUser();
+            Post["/login"] = r => Login();
             Post["/clientkey"] = r => SaveKey();
             Post["/devicetoken"] = r => SaveAppleToken();
             Post["/clearkey"] = r => ClearKey();
@@ -26,7 +36,7 @@ namespace FeelKnitService.Modules
             Post["/saveAvatar"] = r => UpdateUserAvatar();
         }
 
-        
+
         private bool UpdateUserAvatar()
         {
             var user = this.Bind<User>();
@@ -113,7 +123,7 @@ namespace FeelKnitService.Modules
             return true;
         }
 
-        private dynamic VerfiyUser()
+        private dynamic Login()
         {
             var user = this.Bind<User>();
             var dbUser = Context.Users.Find(Query<User>.EQ(u => u.UserName, user.UserName)).FirstOrDefault();
@@ -121,7 +131,26 @@ namespace FeelKnitService.Modules
 
             var hashedPassword = string.Format("sha1:{0}:{1}:{2}", PasswordHash.PBKDF2_ITERATIONS, dbUser.PasswordSalt, dbUser.Password);
             bool isValidPassword = PasswordHash.ValidatePassword(user.Password, hashedPassword);
-            return isValidPassword ? new { IsLoginSuccessful = true, dbUser.Avatar } : new { IsLoginSuccessful = false, Avatar = string.Empty };
+
+            if (!isValidPassword)
+                return new { IsLoginSuccessful = false, Avatar = string.Empty };
+
+            var jwttoken = new JwtToken
+            {
+                   Issuer = "http://feelknit.com",
+                   Audience = "http://feelknit-audience.com",
+                   Claims =
+                       new List<Claim>(new[]
+                        {
+                            new Claim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "User"),
+                            new Claim(ClaimTypes.Name, user.UserName)
+                        }),
+                   Expiry = DateTime.UtcNow.AddDays(7)
+               };
+
+            var token = _jwtWrapper.Encode(jwttoken, _configProvider.GetAppSetting("securekey"), JwtHashAlgorithm.HS256);
+            Negotiate.WithModel(token);
+            return new { IsLoginSuccessful = true, dbUser.Avatar, Token = token };
             //var isValidPassword = PasswordHash.ValidatePassword(user.Password, hashedPassword) &&
             //    (dbUser.PasswordExpiryTime == null || DateTime.UtcNow < dbUser.PasswordExpiryTime);
             //return new UserVerification { IsTemporary = dbUser.IsTemporary, IsValid = isValidPassword };

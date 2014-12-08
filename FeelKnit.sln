@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeelKnitService", "FeelKnitService\FeelKnitService.csproj", "{06A736DC-8CBD-4DB5-8A08-1A4AB8C8DFF3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeelKnit.Tests", "FeelKnit.Tests\FeelKnit.Tests.csproj", "{D53FC853-6B04-4200-A3D3-D8FA808DF986}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCreator", "DataCreator\DataCreator.csproj", "{13528C53-9EF4-4176-9FCD-D343A72A9CC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owin.StatelessAuth", "Owin.StatelessAuth\Owin.StatelessAuth.csproj", "{F8CF626C-D9B6-43A1-B09E-3C44BD748D6C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{13528C53-9EF4-4176-9FCD-D343A72A9CC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13528C53-9EF4-4176-9FCD-D343A72A9CC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13528C53-9EF4-4176-9FCD-D343A72A9CC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8CF626C-D9B6-43A1-B09E-3C44BD748D6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8CF626C-D9B6-43A1-B09E-3C44BD748D6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8CF626C-D9B6-43A1-B09E-3C44BD748D6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8CF626C-D9B6-43A1-B09E-3C44BD748D6C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
