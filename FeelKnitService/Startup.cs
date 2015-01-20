@@ -6,10 +6,10 @@ namespace FeelKnitService
 {
     public class Startup
     {
-        public void Configuration(IAppBuilder app)  
+        public void Configuration(IAppBuilder app)
         {
             app.RequiresStatelessAuth(new TokenValidator(new ConfigProvider()),
-                new StatelessAuthOptions { IgnorePaths = new List<string>(new[] { "/users/login", "/content/*.js" }) })
+                new StatelessAuthOptions { IgnorePaths = new List<string>(new[] { "/users/login", "/users", "/feelings/getfeels", "/content/*.js" }) })
                 .UseNancy();
 
         }

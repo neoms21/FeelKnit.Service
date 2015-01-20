@@ -127,28 +127,15 @@ namespace FeelKnitService.Modules
         {
             var user = this.Bind<User>();
             var dbUser = Context.Users.Find(Query<User>.EQ(u => u.UserName, user.UserName)).FirstOrDefault();
-            if (dbUser == null) return false;
+            if (dbUser == null) return new { IsLoginSuccessful = false };
 
             var hashedPassword = string.Format("sha1:{0}:{1}:{2}", PasswordHash.PBKDF2_ITERATIONS, dbUser.PasswordSalt, dbUser.Password);
-            bool isValidPassword = PasswordHash.ValidatePassword(user.Password, hashedPassword);
+            var isValidPassword = PasswordHash.ValidatePassword(user.Password, hashedPassword);
 
             if (!isValidPassword)
                 return new { IsLoginSuccessful = false, Avatar = string.Empty };
 
-            var jwttoken = new JwtToken
-            {
-                   Issuer = "http://feelknit.com",
-                   Audience = "http://feelknit-audience.com",
-                   Claims =
-                       new List<Claim>(new[]
-                        {
-                            new Claim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "User"),
-                            new Claim(ClaimTypes.Name, user.UserName)
-                        }),
-                   Expiry = DateTime.UtcNow.AddDays(7)
-               };
-
-            var token = _jwtWrapper.Encode(jwttoken, _configProvider.GetAppSetting("securekey"), JwtHashAlgorithm.HS256);
+            var token = GenerateAuthorizationToken(user.UserName);
             Negotiate.WithModel(token);
             return new { IsLoginSuccessful = true, dbUser.Avatar, Token = token };
             //var isValidPassword = PasswordHash.ValidatePassword(user.Password, hashedPassword) &&
@@ -156,7 +143,8 @@ namespace FeelKnitService.Modules
             //return new UserVerification { IsTemporary = dbUser.IsTemporary, IsValid = isValidPassword };
         }
 
-        private string CreateUser()
+
+        private dynamic CreateUser()
         {
             var user = this.Bind<User>();
             user.UserName = user.UserName.Trim();
@@ -164,7 +152,8 @@ namespace FeelKnitService.Modules
                 return "Failure";
             SetHashedPassword(user);
             Context.Users.Insert(user);
-            return "true";
+            var token = GenerateAuthorizationToken(user.UserName);
+            return new { IsLoginSuccessful = true, Token = token };
         }
 
         private static void SetHashedPassword(User user, string password = "")
@@ -172,6 +161,25 @@ namespace FeelKnitService.Modules
             var hashedPassword = PasswordHash.CreateHash(string.IsNullOrEmpty(password) ? user.Password : password).Split(':');
             user.PasswordSalt = hashedPassword[2];
             user.Password = hashedPassword[3];
+        }
+
+        private string GenerateAuthorizationToken(string username)
+        {
+            var jwttoken = new JwtToken
+            {
+                Issuer = "http://feelknit.com",
+                Audience = "http://feelknit-audience.com",
+                Claims =
+                    new List<Claim>(new[]
+                    {
+                        new Claim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "User"),
+                        new Claim(ClaimTypes.Name, username)
+                    }),
+                Expiry = DateTime.UtcNow.AddDays(7)
+            };
+
+            var token = _jwtWrapper.Encode(jwttoken, _configProvider.GetAppSetting("securekey"), JwtHashAlgorithm.HS256);
+            return token;
         }
     }
 }

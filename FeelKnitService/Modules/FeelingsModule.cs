@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FeelKnitService.Helpers;
 using FeelKnitService.Model;
 using FeelKnitService.Push;
 using MongoDB.Bson;
@@ -38,12 +39,13 @@ namespace FeelKnitService.Modules
 
             var relatedFeelings = FindFeelings(feeling.FeelingTextLower, feeling.UserName).ToList();
             relatedFeelings.Insert(0, feeling);
+            AddUserAvatar(relatedFeelings);
             return relatedFeelings;
         }
 
         private IEnumerable<string> Fetchfeels()
         {
-           // var push = new PushNotificationApple();
+            // var push = new PushNotificationApple();
             var feels = Context.Feels.AsQueryable();
             return feels.OrderBy(x => x.Rank).Select(x => x.Text);
         }
@@ -100,7 +102,18 @@ namespace FeelKnitService.Modules
         private IEnumerable<Feeling> FindFeelingsForUser(object username)
         {
             var findFeelingsForUser = Context.Feelings.Find(Query.EQ("UserName", new BsonString(username.ToString())));
-            return findFeelingsForUser.OrderByDescending(f => f.FeelingDate);
+            var feelings = findFeelingsForUser.OrderByDescending(f => f.FeelingDate).ToList();
+            AddUserAvatar(feelings);
+            return feelings;
+        }
+
+        private void AddUserAvatar(List<Feeling> feelings)
+        {
+            feelings.ForEach(x =>
+            {
+                var dbUser = Context.Users.FindOne(Query.EQ("UserName", new BsonString(x.UserName)));
+                x.User = new User { UserName = dbUser.UserName, Avatar = dbUser.Avatar };
+            });
         }
 
         private IEnumerable<Feeling> FindFeelings(string feelingText, string username)
