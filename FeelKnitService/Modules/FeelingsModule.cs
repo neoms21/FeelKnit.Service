@@ -67,7 +67,8 @@ namespace FeelKnitService.Modules
             var commentQuery = Query<Comment>.EQ(pr => pr.User, Convert.ToString(username));
             var finalQuery = Query<Feeling>.ElemMatch(p => p.Comments, builder => commentQuery);
 
-            return Context.Feelings.Find(finalQuery).OrderByDescending(f => f.FeelingDate);
+            var findFeelingsForCommentsUser = Context.Feelings.Find(finalQuery).OrderByDescending(f => f.FeelingDate);
+            return findFeelingsForCommentsUser;
         }
 
         private object IncreaseSupportCount()
@@ -154,7 +155,6 @@ namespace FeelKnitService.Modules
             allFeelings.Remove(currentFeeling);
             return allFeelings;
         }
-
 
         private int GetRandom()
         {

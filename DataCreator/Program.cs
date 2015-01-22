@@ -139,7 +139,7 @@ namespace DataCreator
         private static void FormatComments()
         {
             var users = _context.Users.FindAll();
-            var feelings = _context.Feelings.FindAll().Where(f => f.Comments.Any() && f.Comments.All(c => c.CommentUser == null)).ToList();
+            var feelings = _context.Feelings.FindAll().Where(f => f.Comments.Any() && f.Comments.All(c => c.User == null)).ToList();
             Console.WriteLine(feelings.Count());
             var index = 1;
             var count = 2;
@@ -150,7 +150,7 @@ namespace DataCreator
                 {
                     var user = users.FirstOrDefault(u => u.UserName == comment.User);
                     if (user != null)
-                        comment.CommentUser = user;
+                        comment.User = user.UserName;
                 }
 
                 _context.Feelings.Save(feeling);

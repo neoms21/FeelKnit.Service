@@ -23,7 +23,7 @@ namespace FeelKnitService.Modules
             //var feeling = Context.Feelings.FindOneById(new ObjectId(feelingId));
             var comment = this.Bind<Comment>();
             var user = Context.Users.FindOne(Query.EQ("UserName", new BsonString(comment.User)));
-            comment.CommentUser = user;
+            comment.UserAvatar = user.Avatar;
             comment.PostedAt = DateTime.UtcNow;
             var modUpdate1 = Update<Feeling>.Push(p => p.Comments, comment);
 

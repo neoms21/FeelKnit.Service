@@ -13,8 +13,6 @@ namespace FeelKnitService.Model
 
         public string User { get; set; }
 
-        public User CommentUser { get; set; }
-
         public string UserAvatar { get; set; }
 
         public DateTime PostedAt { get; set; }
