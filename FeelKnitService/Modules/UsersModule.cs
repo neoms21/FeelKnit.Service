@@ -9,7 +9,6 @@ using MongoDB.Bson;
 using MongoDB.Driver.Builders;
 using Nancy;
 using Nancy.ModelBinding;
-using Nancy.Responses.Negotiation;
 
 namespace FeelKnitService.Modules
 {
@@ -34,6 +33,7 @@ namespace FeelKnitService.Modules
             Post["/updateEmail"] = r => UpdateEmail();
             Post["/updatePassword"] = r => UpdatePassword();
             Post["/saveAvatar"] = r => UpdateUserAvatar();
+            Post["/saveuser"] = r => UpdateUserProfile();
         }
 
 
@@ -133,11 +133,11 @@ namespace FeelKnitService.Modules
             var isValidPassword = PasswordHash.ValidatePassword(user.Password, hashedPassword);
 
             if (!isValidPassword)
-                return new { IsLoginSuccessful = false, Avatar = string.Empty };
+                return new { IsLoginSuccessful = false, Avatar = string.Empty};
 
             var token = GenerateAuthorizationToken(user.UserName);
             Negotiate.WithModel(token);
-            return new { IsLoginSuccessful = true, dbUser.Avatar, Token = token };
+            return new { IsLoginSuccessful = true, dbUser.Avatar, Token = token, UserEmail = dbUser.EmailAddress };
             //var isValidPassword = PasswordHash.ValidatePassword(user.Password, hashedPassword) &&
             //    (dbUser.PasswordExpiryTime == null || DateTime.UtcNow < dbUser.PasswordExpiryTime);
             //return new UserVerification { IsTemporary = dbUser.IsTemporary, IsValid = isValidPassword };
@@ -153,7 +153,7 @@ namespace FeelKnitService.Modules
             SetHashedPassword(user);
             Context.Users.Insert(user);
             var token = GenerateAuthorizationToken(user.UserName);
-            return new { IsLoginSuccessful = true, Token = token };
+            return new { IsLoginSuccessful = true, Token = token, UserEmail = user.EmailAddress };
         }
 
         private static void SetHashedPassword(User user, string password = "")
@@ -175,11 +175,21 @@ namespace FeelKnitService.Modules
                         new Claim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "User"),
                         new Claim(ClaimTypes.Name, username)
                     }),
-                Expiry = DateTime.UtcNow.AddDays(7)
+                Expiry = DateTime.UtcNow.AddYears(10)
             };
 
             var token = _jwtWrapper.Encode(jwttoken, _configProvider.GetAppSetting("securekey"), JwtHashAlgorithm.HS256);
             return token;
+        }
+
+        private bool UpdateUserProfile()
+        {
+            var user = this.Bind<User>();
+            var dbUser = GetUser(user.UserName);
+            dbUser.Avatar = user.Avatar;
+            dbUser.EmailAddress = user.EmailAddress;
+            Context.Users.Save(dbUser);
+            return true;
         }
     }
 }
