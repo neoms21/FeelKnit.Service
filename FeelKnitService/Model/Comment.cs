@@ -1,13 +1,13 @@
 ﻿using System;
-using MongoDB.Bson;
+using FeelKnitService.Serializers;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace FeelKnitService.Model
 {
     public class Comment
     {
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+        [BsonSerializer(typeof(StringOrGuidSerializer))]
+        public Guid Id { get; set; }
 
         public string Text { get; set; }
 
@@ -16,6 +16,14 @@ namespace FeelKnitService.Model
         public string UserAvatar { get; set; }
 
         public DateTime PostedAt { get; set; }
+
+        public bool IsReported { get; set; }
+        
+        public string ReportedBy{ get; set; }
+        
+        public DateTime ReportedAt{ get; set; }
+
+        public bool IsDeleted { get; set; }
 
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FeelKnitService.Helpers;
 using FeelKnitService.Model;
 using MongoDB.Bson;
 using MongoDB.Driver.Builders;
@@ -16,6 +17,7 @@ namespace FeelKnitService.Modules
             : base("/comments")
         {
             Post["/{feelingId}"] = r => AddComment(r.feelingId);
+            Post["/report"] = r => ReportComment();
         }
 
         private object AddComment(dynamic feelingId)
@@ -25,8 +27,10 @@ namespace FeelKnitService.Modules
             var user = Context.Users.FindOne(Query.EQ("UserName", new BsonString(comment.User)));
             comment.UserAvatar = user.Avatar;
             comment.PostedAt = DateTime.UtcNow;
+            comment.Id = Guid.NewGuid();
+            
             var modUpdate1 = Update<Feeling>.Push(p => p.Comments, comment);
-
+            
             Context.Feelings.Update(Query.EQ("_id", new ObjectId(feelingId)), modUpdate1);
             Task.Factory.StartNew(delegate
             {
@@ -46,6 +50,23 @@ namespace FeelKnitService.Modules
             });
 
             return comment;
+        }
+
+        private object ReportComment()
+        {
+            var comment = this.Bind<Comment>();
+            var feelingId = Request.Form["feelingId"];
+            var feeling = Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(feelingId)));
+            var commentToReport = feeling.Comments.First(c => c.Id == comment.Id);
+            commentToReport.IsReported = true;
+            commentToReport.ReportedBy = comment.ReportedBy;
+            commentToReport.ReportedAt = DateTime.UtcNow;
+
+            Context.Feelings.Save(feeling);
+
+            new EmailHelper().SendEmail("Comment Reported!!", string.Format("CommentId - {0} under FeelingId {1} has been reported by {2}",
+               commentToReport.Id, feelingId, comment.ReportedBy));
+            return null;
         }
 
         private void SendNotification(Feeling feeling, Comment comment, List<User> users, User feelingUser)

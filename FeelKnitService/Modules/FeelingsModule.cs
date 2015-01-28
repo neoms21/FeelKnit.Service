@@ -28,6 +28,7 @@ namespace FeelKnitService.Modules
             Post["/"] = r => CreateFeeling();
             Post["/increasesupport"] = r => IncreaseSupportCount();
             Post["/decreasesupport"] = r => DecreaseSupportCount();
+            Post["/report"] = r => ReportFeeling();
         }
 
         private IEnumerable<Feeling> FindRelatedFeelingsForUser(object username)
@@ -39,6 +40,7 @@ namespace FeelKnitService.Modules
 
             var relatedFeelings = FindFeelings(feeling.FeelingTextLower, feeling.UserName).ToList();
             relatedFeelings.Insert(0, feeling);
+            RemoveDeletedComments(relatedFeelings);
             AddUserAvatar(relatedFeelings);
             return relatedFeelings;
         }
@@ -102,26 +104,21 @@ namespace FeelKnitService.Modules
 
         private IEnumerable<Feeling> FindFeelingsForUser(object username)
         {
-            var findFeelingsForUser = Context.Feelings.Find(Query.EQ("UserName", new BsonString(username.ToString())));
+            var finalQuery = Query.And(Query.EQ("UserName", new BsonString(username.ToString())));
+
+            var findFeelingsForUser = Context.Feelings.Find(finalQuery);
             var feelings = findFeelingsForUser.OrderByDescending(f => f.FeelingDate).ToList();
+            RemoveDeletedComments(feelings);
             AddUserAvatar(feelings);
             return feelings;
         }
 
-        private void AddUserAvatar(List<Feeling> feelings)
-        {
-            feelings.ForEach(x =>
-            {
-                var dbUser = Context.Users.FindOne(Query.EQ("UserName", new BsonString(x.UserName)));
-                x.User = new User { UserName = dbUser.UserName, Avatar = dbUser.Avatar };
-            });
-        }
-
         private IEnumerable<Feeling> FindFeelings(string feelingText, string username)
         {
+
             var query = Query.And(Query.EQ("FeelingTextLower", new BsonString(feelingText)),
                 Query.EQ("IsCurrentFeeling", new BsonBoolean(true)),
-                Query.NE("UserName", new BsonString(username)));
+                Query.NE("UserName", new BsonString(username)), Query.NE("IsDeleted", new BsonBoolean(false)));
 
             var relatedFeelings = Context.Feelings.Find(query);
             var groupedFeelings = relatedFeelings.OrderByDescending(f => f.FeelingDate).GroupBy(f => f.UserName);
@@ -129,15 +126,6 @@ namespace FeelKnitService.Modules
 
             return finalFeelings;
         }
-
-        //private IEnumerable<Feeling> FindFeelings()
-        //{
-        //    var feeling = Request.Query.feeling;
-        //    var username = Request.Query.username;
-        //    var query = Query.And(Query.EQ("FeelingTextLower", new BsonString(feeling)), Query.NE("UserName", new BsonString(username)));
-
-        //    return Context.Feelings.Find(query).SetSortOrder(SortBy.Descending("feelingDate"));
-        //  }
 
         private IEnumerable<Feeling> CreateFeeling()
         {
@@ -153,13 +141,39 @@ namespace FeelKnitService.Modules
             var allFeelings = FindFeelings(feeling.FeelingTextLower, feeling.UserName).ToList();
             var currentFeeling = allFeelings.FirstOrDefault(f => f.Id == feeling.Id);
             allFeelings.Remove(currentFeeling);
+            RemoveDeletedComments(allFeelings);
             return allFeelings;
         }
 
-        private int GetRandom()
+        private object ReportFeeling()
         {
-            var rnd = new Random();
-            return rnd.Next(0, 10);
+            var feelingId = Request.Form["feelingId"];
+            var feeling = Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(feelingId)));
+            feeling.IsReported = true;
+            Context.Feelings.Save(feeling);
+            var username = Request.Form["username"];
+            new EmailHelper().SendEmail("Feeling Reported!!", string.Format("FeelingId {0} has been reported by {1}", feelingId, username));
+            return null;
         }
+
+        private void RemoveDeletedComments(IEnumerable<Feeling> feelings)
+        {
+            foreach (var feeling in feelings)
+            {
+                var comments = feeling.Comments.Where(c => !c.IsDeleted && !c.IsReported).ToList();
+                feeling.Comments.Clear();
+                feeling.Comments = comments.ToList();
+            }
+        }
+
+        private void AddUserAvatar(List<Feeling> feelings)
+        {
+            feelings.ForEach(x =>
+            {
+                var dbUser = Context.Users.FindOne(Query.EQ("UserName", new BsonString(x.UserName)));
+                x.User = new User { UserName = dbUser.UserName, Avatar = dbUser.Avatar };
+            });
+        }
+
     }
 }

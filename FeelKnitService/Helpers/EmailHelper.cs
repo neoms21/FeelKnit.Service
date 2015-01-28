@@ -9,10 +9,9 @@ namespace FeelKnitService.Helpers
     public class EmailHelper
     {
 
-        public void SendEmail(string feelingId, string username)
+        public void SendEmail(string subject, string content)
         {
-            Send("Feeling Reported!!", string.Format("FeelingId {0} has been reported by {1}", feelingId, username),
-                "neoms21@gmail.com", "sanket.mali@gmail.com");
+            Send(subject, content, "neoms21@gmail.com", "sanket.mali@gmail.com");
         }
 
         public static void Send(string subject, string msg, params string[] toAdd)

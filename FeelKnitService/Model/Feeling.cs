@@ -55,6 +55,10 @@ namespace FeelKnitService.Model
         
         public bool IsCurrentFeeling { get; set; }
 
+        public DateTime ReportedAt { get; set; }
+
+        public bool IsDeleted { get; set; }
+
         public double Latitude
         {
             get { return _latitude; }
