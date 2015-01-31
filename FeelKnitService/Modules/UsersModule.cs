@@ -133,7 +133,7 @@ namespace FeelKnitService.Modules
             var isValidPassword = PasswordHash.ValidatePassword(user.Password, hashedPassword);
 
             if (!isValidPassword)
-                return new { IsLoginSuccessful = false, Avatar = string.Empty};
+                return new { IsLoginSuccessful = false, Avatar = string.Empty };
 
             var token = GenerateAuthorizationToken(user.UserName);
             Negotiate.WithModel(token);
@@ -149,7 +149,8 @@ namespace FeelKnitService.Modules
             var user = this.Bind<User>();
             user.UserName = user.UserName.Trim();
             if (Context.Users.FindOne(Query.EQ("UserName", BsonValue.Create(user.UserName))) != null)
-                return "Failure";
+                return new { IsLoginSuccessful = false, Error = "Username is not unique." };
+
             SetHashedPassword(user);
             Context.Users.Insert(user);
             var token = GenerateAuthorizationToken(user.UserName);

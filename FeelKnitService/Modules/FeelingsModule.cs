@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FeelKnitService.Helpers;
 using FeelKnitService.Model;
-using FeelKnitService.Push;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
@@ -168,10 +166,15 @@ namespace FeelKnitService.Modules
 
         private void AddUserAvatar(List<Feeling> feelings)
         {
-            feelings.ForEach(x =>
+            feelings.ForEach(f =>
             {
-                var dbUser = Context.Users.FindOne(Query.EQ("UserName", new BsonString(x.UserName)));
-                x.User = new User { UserName = dbUser.UserName, Avatar = dbUser.Avatar };
+                var dbUser = Context.Users.FindOne(Query.EQ("UserName", new BsonString(f.UserName)));
+                f.User = new User { UserName = dbUser.UserName, Avatar = dbUser.Avatar };
+                f.Comments.ForEach(c =>
+                {
+                    var dbUserForComment = Context.Users.FindOne(Query.EQ("UserName", new BsonString(c.User)));
+                    c.UserAvatar = dbUserForComment.Avatar;
+                });
             });
         }
 
