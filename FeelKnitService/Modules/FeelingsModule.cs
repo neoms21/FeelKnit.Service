@@ -27,6 +27,7 @@ namespace FeelKnitService.Modules
             Post["/increasesupport"] = r => IncreaseSupportCount();
             Post["/decreasesupport"] = r => DecreaseSupportCount();
             Post["/report"] = r => ReportFeeling();
+            Post["/createfeel/"] = r => CreateFeels();
         }
 
         private IEnumerable<Feeling> FindRelatedFeelingsForUser(object username)
@@ -162,6 +163,13 @@ namespace FeelKnitService.Modules
                 feeling.Comments.Clear();
                 feeling.Comments = comments.ToList();
             }
+        }
+
+        private object CreateFeels()
+        {
+            var feeling = this.Bind<Feel>();
+            Context.Feels.Insert(feeling);
+            return feeling;
         }
 
         private void AddUserAvatar(List<Feeling> feelings)

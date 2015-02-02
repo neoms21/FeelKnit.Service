@@ -3,10 +3,10 @@
   <Profiles />
   <Settings>
     <Setting Name="FeelingsDatabase" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">294803ec_f609_4dfb_b908_7d054b5ec1db</Value>
+      <Value Profile="(Default)">6f66b9b6_294c_495c_9839_706243311808</Value>
     </Setting>
     <Setting Name="MONGOHQ_URL" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">mongodb://localhost</Value>
+      <Value Profile="(Default)">mongodb://appharbor:65b0d509e8eb92bd3c3a07441154d454@boone.mongohq.com:10000/6f66b9b6_294c_495c_9839_706243311808</Value>
     </Setting>
   </Settings>
 </SettingsFile>

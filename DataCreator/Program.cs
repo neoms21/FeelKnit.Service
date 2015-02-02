@@ -83,11 +83,11 @@ namespace DataCreator
 
         static void Main(string[] args)
         {
-            Console.WriteLine(images.Count());
-            FormatFeelings();
+            //Console.WriteLine(images.Count());
+            //FormatFeelings();
             // var feelings = 
 
-            // _javaScriptSerializer = new JavaScriptSerializer();
+             _javaScriptSerializer = new JavaScriptSerializer();
 
             //var jsonSerializerSettings = new JsonSerializerSettings
             //{
@@ -104,7 +104,7 @@ namespace DataCreator
 
             //_jsonString = javaScriptSerializer.Serialize(new User { User = "xyz", Password = "welcome1", EmailAddress = "ksjdf@fkjsd.com" });
             // EmailHelper.Send("sdfs", "sdfs", "sdfjks@as.com");
-            //CreateFeels();
+            CreateFeels();
             //CreateUsers();
             //CreateFeelings();
             // CreateComments();
