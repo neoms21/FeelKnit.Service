@@ -22,7 +22,6 @@ namespace FeelKnitService.Modules
         {
             _configProvider = configProvider;
             _jwtWrapper = jwtWrapper;
-            Get["/"] = r => new User { UserName = "Manoj" };
 
             Post["/"] = r => CreateUser();
             Post["/login"] = r => Login();
@@ -118,7 +117,7 @@ namespace FeelKnitService.Modules
         {
             var user = this.Bind<User>();
             var dbUser = Context.Users.FindOne(Query<User>.EQ(u => u.UserName, user.UserName));
-            dbUser.iosKey = user.iosKey;
+            dbUser.IosKey = user.IosKey;
             Context.Users.Save(dbUser);
             return true;
         }

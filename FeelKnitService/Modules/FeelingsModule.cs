@@ -117,7 +117,7 @@ namespace FeelKnitService.Modules
 
             var query = Query.And(Query.EQ("FeelingTextLower", new BsonString(feelingText)),
                 Query.EQ("IsCurrentFeeling", new BsonBoolean(true)),
-                Query.NE("UserName", new BsonString(username)), Query.NE("IsDeleted", new BsonBoolean(true)));
+                Query.NE("UserName", new BsonString(username)));
 
             var relatedFeelings = Context.Feelings.Find(query);
             var groupedFeelings = relatedFeelings.OrderByDescending(f => f.FeelingDate).GroupBy(f => f.UserName);
