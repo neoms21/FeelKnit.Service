@@ -125,7 +125,7 @@ namespace FeelKnitService.Modules
         private dynamic Login()
         {
             var user = this.Bind<User>();
-            var dbUser = Context.Users.Find(Query<User>.EQ(u => u.UserName, user.UserName)).FirstOrDefault();
+            var dbUser = Context.Users.Find(Query<User>.EQ(u => u.UserNameLower, user.UserName.ToLowerInvariant())).FirstOrDefault();
             if (dbUser == null) return new { IsLoginSuccessful = false };
 
             var hashedPassword = string.Format("sha1:{0}:{1}:{2}", PasswordHash.PBKDF2_ITERATIONS, dbUser.PasswordSalt, dbUser.Password);

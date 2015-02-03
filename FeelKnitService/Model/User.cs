@@ -10,6 +10,10 @@ namespace FeelKnitService.Model
         private double _longitude;
         private string _userName;
 
+        public User()
+        {
+            Location = new double[2];
+        }
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
@@ -38,6 +42,8 @@ namespace FeelKnitService.Model
         public string Key { get; set; }
 
         public string IosKey { get; set; }
+        
+        public string iosKey { get; set; }
 
         public string Avatar { get; set; }
 
