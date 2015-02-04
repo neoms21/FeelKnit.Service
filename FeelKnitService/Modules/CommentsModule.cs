@@ -28,9 +28,9 @@ namespace FeelKnitService.Modules
             comment.UserAvatar = user.Avatar;
             comment.PostedAt = DateTime.UtcNow;
             comment.Id = Guid.NewGuid();
-            
+
             var modUpdate1 = Update<Feeling>.Push(p => p.Comments, comment);
-            
+
             Context.Feelings.Update(Query.EQ("_id", new ObjectId(feelingId)), modUpdate1);
             Task.Factory.StartNew(delegate
             {
@@ -45,7 +45,7 @@ namespace FeelKnitService.Modules
                 var bsonValues = new List<BsonValue>();
                 commentUsers.ForEach(c => bsonValues.Add(BsonValue.Create(c)));
                 var users = Context.Users.Find(Query.In("UserName", bsonValues)).ToList();
-                    //.First(u => u.UserName.Equals(feeling.UserName));
+                //.First(u => u.UserName.Equals(feeling.UserName));
                 SendNotification(feeling, comment, users, feelingUser);
             });
 
@@ -83,7 +83,7 @@ namespace FeelKnitService.Modules
 
         private void SaveResponse(string response)
         {
-            Context.Responses.Insert(new Response { ResponseText = response });
+            Context.Responses.Insert(new Response { ResponseText = response, TimeRecorded = DateTime.UtcNow });
         }
     }
 }

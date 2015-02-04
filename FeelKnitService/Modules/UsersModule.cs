@@ -125,7 +125,7 @@ namespace FeelKnitService.Modules
         private dynamic Login()
         {
             var user = this.Bind<User>();
-            var dbUser = Context.Users.Find(Query<User>.EQ(u => u.UserNameLower, user.UserName.ToLowerInvariant())).FirstOrDefault();
+            var dbUser = GetDbUser(user);
             if (dbUser == null) return new { IsLoginSuccessful = false };
 
             var hashedPassword = string.Format("sha1:{0}:{1}:{2}", PasswordHash.PBKDF2_ITERATIONS, dbUser.PasswordSalt, dbUser.Password);
@@ -142,12 +142,11 @@ namespace FeelKnitService.Modules
             //return new UserVerification { IsTemporary = dbUser.IsTemporary, IsValid = isValidPassword };
         }
 
-
         private dynamic CreateUser()
         {
             var user = this.Bind<User>();
             user.UserName = user.UserName.Trim();
-            if (Context.Users.FindOne(Query.EQ("UserName", BsonValue.Create(user.UserName))) != null)
+            if (GetDbUser(user) != null)
                 return new { IsLoginSuccessful = false, Error = "Username is not unique." };
 
             SetHashedPassword(user);
@@ -191,5 +190,11 @@ namespace FeelKnitService.Modules
             Context.Users.Save(dbUser);
             return true;
         }
+
+        private User GetDbUser(User user)
+        {
+            return Context.Users.FindOne(Query<User>.EQ(u => u.UserNameLower, user.UserName.ToLower()));
+        }
+
     }
 }

@@ -78,13 +78,11 @@ namespace FeelKnitService
                 using (var reader = new StreamReader(response.GetResponseStream()))
                 {
                     var responseFromServer = reader.ReadToEnd();
-                    _action(responseFromServer);
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                _action(e.ToString());
                 _action(e.ToString());
             }
         }
