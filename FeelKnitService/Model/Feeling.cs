@@ -36,8 +36,10 @@ namespace FeelKnitService.Model
         public DateTime FeelingDate { get; set; }
 
         public string UserName { get; set; }
+        
+        public string UserAvatar { get; set; }
 
-        public User User { get; set; }
+       // public User User { get; set; }
 
         public string Reason { get; set; }
 

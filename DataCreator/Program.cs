@@ -115,27 +115,7 @@ namespace DataCreator
             // PostRequest(jsonString, URL);
         }
 
-        private static void FormatFeelings()
-        {
-            var users = _context.Users.FindAll();
-            var feelings = _context.Feelings.FindAll().Where(f => f.User == null).ToList();
-            Console.WriteLine(feelings.Count());
-            var index = 1;
-            var count = 2;
-            foreach (var feeling in feelings)
-            {
-                var user = users.FirstOrDefault(u => u.UserName == feeling.UserName);
-                if (user != null)
-                    feeling.User = user;
-
-                _context.Feelings.Save(feeling);
-
-                index++;
-            }
-
-            Console.WriteLine(index);
-        }
-
+       
         private static void FormatComments()
         {
             var users = _context.Users.FindAll();

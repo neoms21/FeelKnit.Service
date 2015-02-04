@@ -135,7 +135,7 @@ namespace FeelKnitService.Modules
             feeling.FeelingDate = DateTime.UtcNow;
             feeling.IsCurrentFeeling = true;
             var dbUser = Context.Users.FindOne(Query.EQ("UserName", new BsonString(feeling.UserName)));
-            feeling.User = dbUser;
+            feeling.UserAvatar = dbUser.Avatar;
             Context.Feelings.Insert(feeling);
             var allFeelings = FindFeelings(feeling.FeelingTextLower, feeling.UserName).ToList();
             var currentFeeling = allFeelings.FirstOrDefault(f => f.Id == feeling.Id);
@@ -177,7 +177,7 @@ namespace FeelKnitService.Modules
             feelings.ForEach(f =>
             {
                 var dbUser = Context.Users.FindOne(Query.EQ("UserName", new BsonString(f.UserName)));
-                f.User = new User { UserName = dbUser.UserName, Avatar = dbUser.Avatar };
+                f.UserAvatar = dbUser.Avatar;
                 f.Comments.ForEach(c =>
                 {
                     var dbUserForComment = Context.Users.FindOne(Query.EQ("UserName", new BsonString(c.User)));
