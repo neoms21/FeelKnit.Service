@@ -29,7 +29,7 @@ namespace FeelKnitService.Model
 
         public string UserNameLower { get; set; }
 
-        private string PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; }
 
         public string Password { get; set; }
 
