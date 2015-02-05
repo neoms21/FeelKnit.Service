@@ -50,7 +50,7 @@ namespace FeelKnitService.Helpers
 
         private static void smtpClient_SendCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            Console.WriteLine(e.Error);
+           // Console.WriteLine(e.Error);
         }
     }
 }

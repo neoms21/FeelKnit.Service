@@ -136,7 +136,7 @@ namespace FeelKnitService.Modules
 
             var token = GenerateAuthorizationToken(user.UserName);
             Negotiate.WithModel(token);
-            return new { IsLoginSuccessful = true, dbUser.Avatar, Token = token, UserEmail = dbUser.EmailAddress };
+            return new { IsLoginSuccessful = true, dbUser.Avatar, Token = token, UserEmail = dbUser.EmailAddress, dbUser.UserName };
             //var isValidPassword = PasswordHash.ValidatePassword(user.Password, hashedPassword) &&
             //    (dbUser.PasswordExpiryTime == null || DateTime.UtcNow < dbUser.PasswordExpiryTime);
             //return new UserVerification { IsTemporary = dbUser.IsTemporary, IsValid = isValidPassword };
@@ -147,7 +147,7 @@ namespace FeelKnitService.Modules
             var user = this.Bind<User>();
             user.UserName = user.UserName.Trim();
             if (GetDbUser(user) != null)
-                return new { IsLoginSuccessful = false, Error = "Username is not unique." };
+                return new { IsLoginSuccessful = false, Error = "Username is not unique.", user.UserName };
 
             SetHashedPassword(user);
             Context.Users.Insert(user);

@@ -87,7 +87,7 @@ namespace DataCreator
             //FormatFeelings();
             // var feelings = 
 
-             _javaScriptSerializer = new JavaScriptSerializer();
+            _javaScriptSerializer = new JavaScriptSerializer();
 
             //var jsonSerializerSettings = new JsonSerializerSettings
             //{
@@ -101,10 +101,11 @@ namespace DataCreator
 
             //var x = PasswordHash.ValidatePassword("HelloWorld", hash);
 
+            _context.ApplicationSettings.Insert(new ApplicationSetting { FeelingsUpdated = false });
 
             //_jsonString = javaScriptSerializer.Serialize(new User { User = "xyz", Password = "welcome1", EmailAddress = "ksjdf@fkjsd.com" });
             // EmailHelper.Send("sdfs", "sdfs", "sdfjks@as.com");
-            CreateFeels();
+            // CreateFeels();
             //CreateUsers();
             //CreateFeelings();
             // CreateComments();
@@ -115,7 +116,7 @@ namespace DataCreator
             // PostRequest(jsonString, URL);
         }
 
-       
+
         private static void FormatComments()
         {
             var users = _context.Users.FindAll();

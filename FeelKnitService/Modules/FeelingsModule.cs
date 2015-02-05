@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using FeelKnitService.Helpers;
 using FeelKnitService.Model;
 using MongoDB.Bson;
@@ -103,7 +104,7 @@ namespace FeelKnitService.Modules
 
         private IEnumerable<Feeling> FindFeelingsForUser(object username)
         {
-            var finalQuery = Query.And(Query.EQ("UserName", new BsonString(username.ToString())));
+            var finalQuery = Query.And(Query.EQ("UserName", new BsonString(username.ToString())), Query.NE("IsDeleted", new BsonBoolean(true)));
 
             var findFeelingsForUser = Context.Feelings.Find(finalQuery);
             var feelings = findFeelingsForUser.OrderByDescending(f => f.FeelingDate).ToList();
@@ -114,10 +115,9 @@ namespace FeelKnitService.Modules
 
         private IEnumerable<Feeling> FindFeelings(string feelingText, string username)
         {
-
             var query = Query.And(Query.EQ("FeelingTextLower", new BsonString(feelingText)),
                 Query.EQ("IsCurrentFeeling", new BsonBoolean(true)),
-                Query.NE("UserName", new BsonString(username)));
+                Query.NE("UserName", new BsonString(username)),Query.NE("IsDeleted", new BsonBoolean(true)));
 
             var relatedFeelings = Context.Feelings.Find(query);
             var groupedFeelings = relatedFeelings.OrderByDescending(f => f.FeelingDate).GroupBy(f => f.UserName);
@@ -151,8 +151,13 @@ namespace FeelKnitService.Modules
             feeling.IsReported = true;
             Context.Feelings.Save(feeling);
             var username = Request.Form["username"];
-            new EmailHelper().SendEmail("Feeling Reported!!", string.Format("FeelingId {0} has been reported by {1}", feelingId, username));
+            Task.Run((Action)SendEmail(feelingId, username));
             return null;
+        }
+
+        private static dynamic SendEmail(dynamic feelingId, dynamic username)
+        {
+            return new EmailHelper().SendEmail("Feeling Reported!!", string.Format("FeelingId {0} has been reported by {1}", feelingId, username));
         }
 
         private void RemoveDeletedComments(IEnumerable<Feeling> feelings)
