@@ -19,9 +19,9 @@ namespace FeelKnitService.Modules
         {
             Get["/"] = r => AllFeelings();
             Get["/userfeelings"] = r => FindUserFeeling();
-            Get["/username/{username}"] = r => FindFeelingsForUser(r.username);
-            Get["/comments/{username}"] = r => FindFeelingsForCommentsUser(r.username);
-            Get["/relatedfeelings/{username}"] = r => FindRelatedFeelingsForUser(r.username);
+            Get["/reportedByUser/{reportedByUser}"] = r => FindFeelingsForUser(r.username);
+            Get["/comments/{reportedByUser}"] = r => FindFeelingsForCommentsUser(r.username);
+            Get["/relatedfeelings/{reportedByUser}"] = r => FindRelatedFeelingsForUser(r.username);
             Get["/getfeels"] = r => Fetchfeels();
 
             Post["/"] = r => CreateFeeling();
@@ -55,7 +55,7 @@ namespace FeelKnitService.Modules
         private Feeling FindUserFeeling()
         {
             var feelingText = Request.Query["feeling"].ToString().ToLower();
-            var username = Request.Query["username"];
+            var username = Request.Query["reportedByUser"];
             var query = Query.And(Query.EQ("FeelingTextLower", new BsonString(feelingText)),
                Query.EQ("UserName", new BsonString(username)));
 
@@ -76,7 +76,7 @@ namespace FeelKnitService.Modules
         private object IncreaseSupportCount()
         {
             var feelingId = Request.Form["feelingId"];
-            string username = Request.Form["username"].ToString();
+            string username = Request.Form["reportedByUser"].ToString();
             var feeling = Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(new ObjectId(feelingId.ToString()))));
             var modUpdate = Update<Feeling>.Push(f => f.SupportUsers, username);
             feeling.SupportCount += 1;
@@ -88,7 +88,7 @@ namespace FeelKnitService.Modules
         private object DecreaseSupportCount()
         {
             var feelingId = Request.Form["feelingId"];
-            string username = Request.Form["username"].ToString();
+            string username = Request.Form["reportedByUser"].ToString();
             var feeling = Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(new ObjectId(feelingId.ToString()))));
             var modUpdate = Update<Feeling>.Pull(f => f.SupportUsers, username);
             feeling.SupportCount -= 1;
@@ -117,7 +117,7 @@ namespace FeelKnitService.Modules
         {
             var query = Query.And(Query.EQ("FeelingTextLower", new BsonString(feelingText)),
                 Query.EQ("IsCurrentFeeling", new BsonBoolean(true)),
-                Query.NE("UserName", new BsonString(username)),Query.NE("IsDeleted", new BsonBoolean(true)));
+                Query.NE("UserName", new BsonString(username)), Query.NE("IsDeleted", new BsonBoolean(true)));
 
             var relatedFeelings = Context.Feelings.Find(query);
             var groupedFeelings = relatedFeelings.OrderByDescending(f => f.FeelingDate).GroupBy(f => f.UserName);
@@ -150,14 +150,14 @@ namespace FeelKnitService.Modules
             var feeling = Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(feelingId)));
             feeling.IsReported = true;
             Context.Feelings.Save(feeling);
-            var username = Request.Form["username"];
-            Task.Run((Action)SendEmail(feelingId, username));
+            var reportedByUser = Request.Form["reportedByUser"];
+            Task.Run((Action)SendEmail(feelingId, feeling.UserName, reportedByUser));
             return null;
         }
 
-        private static dynamic SendEmail(dynamic feelingId, dynamic username)
+        private static void SendEmail(string feelingId, string userName, string reportedByUser)
         {
-            return new EmailHelper().SendEmail("Feeling Reported!!", string.Format("FeelingId {0} has been reported by {1}", feelingId, username));
+            new EmailHelper().SendEmail("Feeling Reported!!", string.Format("FeelingId {0} of user {1} has been reported by {2}", feelingId, userName, reportedByUser));
         }
 
         private void RemoveDeletedComments(IEnumerable<Feeling> feelings)
