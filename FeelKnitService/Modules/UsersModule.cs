@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using FeelKnitService.Helpers;
 using FeelKnitService.Model;
 using JWT;
-using MongoDB.Bson;
 using MongoDB.Driver.Builders;
 using Nancy;
 using Nancy.ModelBinding;
@@ -147,12 +145,12 @@ namespace FeelKnitService.Modules
             var user = this.Bind<User>();
             user.UserName = user.UserName.Trim();
             if (GetDbUser(user) != null)
-                return new { IsLoginSuccessful = false, Error = "Username is not unique.", user.UserName };
+                return new { IsLoginSuccessful = false, Error = "Username is not unique." };
 
             SetHashedPassword(user);
             Context.Users.Insert(user);
             var token = GenerateAuthorizationToken(user.UserName);
-            return new { IsLoginSuccessful = true, Token = token, UserEmail = user.EmailAddress };
+            return new { IsLoginSuccessful = true, Token = token, UserEmail = user.EmailAddress, user.UserName };
         }
 
         private static void SetHashedPassword(User user, string password = "")
