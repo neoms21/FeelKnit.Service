@@ -60,7 +60,7 @@ namespace FeelKnitService
                 {
                     {"message", message},
                     {"user", userNameFromComment},
-                    {"feeling", JsonConvert.SerializeObject(feeling, Formatting.Indented, jsonSerializerSettings)}
+                    {"feeling", JsonConvert.SerializeObject(feeling.Id, Formatting.Indented, jsonSerializerSettings)}
                 };
 
                 jsonObject.Add("data", data);
@@ -78,6 +78,8 @@ namespace FeelKnitService
                 using (var reader = new StreamReader(response.GetResponseStream()))
                 {
                     var responseFromServer = reader.ReadToEnd();
+                    if (responseFromServer.Contains("failure\":1"))
+                        _action(responseFromServer);
                 }
             }
             catch (Exception e)

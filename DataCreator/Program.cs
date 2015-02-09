@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using FeelKnitService;
 using FeelKnitService.Helpers;
 using FeelKnitService.Model;
+using MongoDB.Driver.Builders;
 using Nancy.Json;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -65,17 +66,29 @@ namespace DataCreator
 
         private static List<string> images = new List<string>
         {
-            "thor",
-            "hulk",
-            "girl1",
-            "girl2",
-            "chef",
-            "blackwidow",
-            "girl3",
-            "ironman",
-            "gru",
-            "eveilminion",
-            "kungfuminion"
+            "ade",
+"ben",
+"billy",
+"billy_boy",
+"carla",
+"coco_moustasche",
+"cora",
+"costa",
+"frank",
+"fred",
+"gav",
+"gus",
+"hena",
+"iri",
+"jayman",
+"john",
+"laly",
+"michela",
+"profile",
+"seby",
+"smith",
+"stella",
+"Thumbs"
         };
         private static readonly FeelingsContext _context = new FeelingsContext();
         private static JavaScriptSerializer _javaScriptSerializer;
@@ -111,6 +124,7 @@ namespace DataCreator
             // CreateComments();
             // CreateApplicationSettings();
             //CallService();
+            SetAvatarsForFeeelings();
             Console.WriteLine("Done!!!!");
             Console.ReadLine();
             // PostRequest(jsonString, URL);
@@ -149,9 +163,33 @@ namespace DataCreator
 
             foreach (var user in users)
             {
-                var randomNumber = GetRandom(11);
+                var randomNumber = GetRandom(22);
                 user.Avatar = images[randomNumber];
                 _context.Users.Save(user);
+            }
+        }
+
+        private static void SetAvatarsForFeeelings()
+        {
+
+            var feelings = _context.Feelings.FindAll();
+            var index = 1;
+
+            foreach (var feeling in feelings)
+            {
+                var user = _context.Users.FindOne(Query<User>.EQ(u => u.UserName, feeling.UserName));
+                feeling.UserAvatar = user.Avatar;
+                Console.WriteLine(index);
+
+                foreach (var comment in feeling.Comments)
+                {
+                    var user2 = _context.Users.FindOne(Query<User>.EQ(u => u.UserName, comment.User));
+                    comment.UserAvatar = user2.Avatar;
+                }
+
+                _context.Feelings.Save(feeling);
+
+                index++;
             }
         }
 
