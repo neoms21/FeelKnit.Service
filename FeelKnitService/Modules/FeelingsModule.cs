@@ -17,7 +17,7 @@ namespace FeelKnitService.Modules
         public FeelingsModule()
             : base("/feelings")
         {
-            Get["/"] = r => AllFeelings();
+            Get["/{feelingId}"] = r => GetFeelingById(r.feelingId);
             Get["/userfeelings"] = r => FindUserFeeling();
             Get["/username/{username}"] = r => FindFeelingsForUser(r.username);
             Get["/comments/{username}"] = r => FindFeelingsForCommentsUser(r.username);
@@ -97,9 +97,9 @@ namespace FeelKnitService.Modules
             return "Done";
         }
 
-        private IEnumerable<Feeling> AllFeelings()
+        private Feeling GetFeelingById(dynamic id)
         {
-            return Context.Feelings.FindAll();
+            return Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(new ObjectId(id.ToString()))));
         }
 
         private IEnumerable<Feeling> FindFeelingsForUser(object username)
