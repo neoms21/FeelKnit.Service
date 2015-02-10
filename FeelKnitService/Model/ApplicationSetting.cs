@@ -9,5 +9,7 @@ namespace FeelKnitService.Model
         public string Id { get; set; }
 
         public bool FeelingsUpdated { get; set; }
+        public bool NewVersionAvailable { get; set; }
+        public string VersionName { get; set; }
     }
 }
