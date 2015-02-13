@@ -9,6 +9,7 @@
 
         private dynamic GetApplicationInfo()
         {
+            return "From info";
             var applicationSetting = Context.ApplicationSettings.FindOne();
             return applicationSetting;
         }
