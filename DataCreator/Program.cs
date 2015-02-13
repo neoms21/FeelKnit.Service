@@ -114,7 +114,7 @@ namespace DataCreator
 
             //var x = PasswordHash.ValidatePassword("HelloWorld", hash);
 
-            _context.ApplicationSettings.Insert(new ApplicationSetting { FeelingsUpdated = false });
+          //  _context.ApplicationSettings.Insert(new ApplicationSetting { FeelingsUpdated = false });
 
             //_jsonString = javaScriptSerializer.Serialize(new User { User = "xyz", Password = "welcome1", EmailAddress = "ksjdf@fkjsd.com" });
             // EmailHelper.Send("sdfs", "sdfs", "sdfjks@as.com");
@@ -123,8 +123,8 @@ namespace DataCreator
             //CreateFeelings();
             // CreateComments();
             // CreateApplicationSettings();
-            //CallService();
-            SetAvatarsForFeeelings();
+            CallService();
+           // SetAvatarsForFeeelings();
             Console.WriteLine("Done!!!!");
             Console.ReadLine();
             // PostRequest(jsonString, URL);
@@ -210,7 +210,7 @@ namespace DataCreator
             try
             {
                 // Send the json to the server using POST
-                Task<HttpResponseMessage> getResponse = httpClient.PostAsync("http://localhost/feelknitservice/users", cntnt);
+                Task<HttpResponseMessage> getResponse = httpClient.GetAsync("http://feelknitapi.com/info");
                 // Wait for the response and read it to a string var
 
                 HttpResponseMessage response = await getResponse;

@@ -12,6 +12,7 @@ namespace FeelKnitService
         protected override void RequestStartup(TinyIoCContainer container, IPipelines pipelines, NancyContext context)
         {
             base.RequestStartup(container, pipelines, context);
+            StaticConfiguration.DisableErrorTraces = false;
             var owinEnvironment = context.GetOwinEnvironment();
             var user = owinEnvironment["server.User"] as ClaimsPrincipal;
             if (user != null)
