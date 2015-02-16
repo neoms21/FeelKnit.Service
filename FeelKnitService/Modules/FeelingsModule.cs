@@ -69,7 +69,8 @@ namespace FeelKnitService.Modules
             var commentQuery = Query<Comment>.EQ(pr => pr.User, Convert.ToString(username));
             var finalQuery = Query<Feeling>.ElemMatch(p => p.Comments, builder => commentQuery);
 
-            var findFeelingsForCommentsUser = Context.Feelings.Find(finalQuery).OrderByDescending(f => f.FeelingDate);
+            var findFeelingsForCommentsUser = Context.Feelings.Find(finalQuery).OrderByDescending(f => f.FeelingDate).ToList();
+            AddUserAvatar(findFeelingsForCommentsUser);
             return findFeelingsForCommentsUser;
         }
 
@@ -144,20 +145,16 @@ namespace FeelKnitService.Modules
             return allFeelings;
         }
 
-        private object ReportFeeling()
+        private dynamic ReportFeeling()
         {
             var feelingId = Request.Form["feelingId"];
             var feeling = Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(feelingId)));
             feeling.IsReported = true;
+            feeling.ReportedAt = DateTime.UtcNow;
             Context.Feelings.Save(feeling);
             var reportedBy = Request.Form["username"];
-            Task.Run((Action)SendEmail(feelingId,feeling.UserName, reportedBy));
+            Task.Run(() => EmailHelper.SendEmail("Feeling Reported!!", string.Format("FeelingId {0} of user {1} has been reported by {2}", feelingId, feeling.UserName, reportedBy)));
             return null;
-        }
-
-        private static void SendEmail(string feelingId, string username, string reportedBy)
-        {
-            new EmailHelper().SendEmail("Feeling Reported!!", string.Format("FeelingId {0} of user {1} has been reported by {2}", feelingId, username, reportedBy));
         }
 
         private void RemoveDeletedComments(IEnumerable<Feeling> feelings)

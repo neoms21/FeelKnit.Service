@@ -63,9 +63,8 @@ namespace FeelKnitService.Modules
             commentToReport.ReportedAt = DateTime.UtcNow;
 
             Context.Feelings.Save(feeling);
-
-            new EmailHelper().SendEmail("Comment Reported!!", string.Format("CommentId - {0} under FeelingId {1} has been reported by {2}",
-               commentToReport.Id, feelingId, comment.ReportedBy));
+            Task.Run(() => EmailHelper.SendEmail("Comment Reported!!", string.Format("CommentId - {0} under FeelingId {1} has been reported by {2}",
+               commentToReport.Id, feelingId, comment.ReportedBy)));
             return null;
         }
 

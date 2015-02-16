@@ -9,9 +9,10 @@ namespace FeelKnitService.Helpers
     public class EmailHelper
     {
 
-        public void SendEmail(string subject, string content)
+        public static bool SendEmail(string subject, string content)
         {
             Send(subject, content, "neoms21@gmail.com", "sanket.mali@gmail.com");
+            return true;
         }
 
         public static void Send(string subject, string msg, params string[] toAdd)
