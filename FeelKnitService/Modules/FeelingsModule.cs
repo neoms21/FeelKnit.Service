@@ -61,6 +61,7 @@ namespace FeelKnitService.Modules
 
 
             Feeling findUserFeeling = Context.Feelings.Find(query).SetSortOrder(SortBy.Descending("feelingDate")).FirstOrDefault();
+            AddUserAvatar(new List<Feeling> { findUserFeeling });
             return findUserFeeling;
         }
 
@@ -142,6 +143,7 @@ namespace FeelKnitService.Modules
             var currentFeeling = allFeelings.FirstOrDefault(f => f.Id == feeling.Id);
             allFeelings.Remove(currentFeeling);
             RemoveDeletedComments(allFeelings);
+            AddUserAvatar(allFeelings);
             return allFeelings;
         }
 
