@@ -163,7 +163,7 @@ namespace FeelKnitService.Modules
         {
             foreach (var feeling in feelings)
             {
-                var comments = feeling.Comments.Where(c => !c.IsDeleted && !c.IsReported).ToList();
+                var comments = feeling.Comments.Where(c => !c.IsDeleted).ToList();
                 feeling.Comments.Clear();
                 feeling.Comments = comments.ToList();
             }
