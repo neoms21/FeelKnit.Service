@@ -44,8 +44,6 @@ namespace FeelKnitService.Model
 
         public string IosKey { get; set; }
         
-        public string iosKey { get; set; }
-
         public string Avatar { get; set; }
 
         public string DeviceName { get; set; }
