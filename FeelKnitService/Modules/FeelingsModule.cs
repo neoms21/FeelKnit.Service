@@ -101,7 +101,9 @@ namespace FeelKnitService.Modules
 
         private Feeling GetFeelingById(dynamic id)
         {
-            return Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(new ObjectId(id.ToString()))));
+            var feeling = Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(new ObjectId(id.ToString()))));
+            AddUserAvatar(new List<Feeling> { feeling });
+            return feeling;
         }
 
         private IEnumerable<Feeling> FindFeelingsForUser(object username)
