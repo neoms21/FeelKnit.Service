@@ -134,6 +134,8 @@ namespace FeelKnitService.Modules
 
             var token = GenerateAuthorizationToken(user.UserName);
             Negotiate.WithModel(token);
+            dbUser.DeviceName = user.DeviceName;
+            Context.Users.Save(dbUser);
             return new { IsLoginSuccessful = true, dbUser.Avatar, Token = token, UserEmail = dbUser.EmailAddress, dbUser.UserName };
             //var isValidPassword = PasswordHash.ValidatePassword(user.Password, hashedPassword) &&
             //    (dbUser.PasswordExpiryTime == null || DateTime.UtcNow < dbUser.PasswordExpiryTime);
@@ -150,6 +152,7 @@ namespace FeelKnitService.Modules
             SetHashedPassword(user);
             Context.Users.Insert(user);
             var token = GenerateAuthorizationToken(user.UserName);
+
             return new { IsLoginSuccessful = true, Token = token, UserEmail = user.EmailAddress, user.UserName };
         }
 

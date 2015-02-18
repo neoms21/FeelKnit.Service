@@ -4,6 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace FeelKnitService.Model
 {
+    [BsonIgnoreExtraElements]
     public class User
     {
         private double _latitude;
@@ -46,6 +47,8 @@ namespace FeelKnitService.Model
         public string iosKey { get; set; }
 
         public string Avatar { get; set; }
+
+        public string DeviceName { get; set; }
 
         public bool IsTemporary { get; set; }
 

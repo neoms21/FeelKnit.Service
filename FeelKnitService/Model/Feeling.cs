@@ -36,10 +36,10 @@ namespace FeelKnitService.Model
         public DateTime FeelingDate { get; set; }
 
         public string UserName { get; set; }
-        
+
         public string UserAvatar { get; set; }
 
-       // public User User { get; set; }
+        // public User User { get; set; }
 
         public string Reason { get; set; }
 
@@ -50,11 +50,11 @@ namespace FeelKnitService.Model
         public double[] Location { get; set; }
 
         public IList<Comment> Comments { get; set; }
-        
+
         public IList<string> SupportUsers { get; set; }
 
         public bool IsReported { get; set; }
-        
+
         public bool IsCurrentFeeling { get; set; }
 
         public DateTime ReportedAt { get; set; }
