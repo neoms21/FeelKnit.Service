@@ -49,7 +49,7 @@ namespace FeelKnitService.Modules
         {
             // var push = new PushNotificationApple();
             var feels = Context.Feels.AsQueryable();
-            return feels.OrderBy(x => x.Rank).Select(x => x.Text);
+            return feels.OrderBy(x => x.Text).Select(x => x.Text);
         }
 
         private Feeling FindUserFeeling()
@@ -174,6 +174,8 @@ namespace FeelKnitService.Modules
         private object CreateFeels()
         {
             var feeling = this.Bind<Feel>();
+            if (string.IsNullOrWhiteSpace(feeling.Text))
+                return null;
             Context.Feels.Insert(feeling);
             return feeling;
         }
