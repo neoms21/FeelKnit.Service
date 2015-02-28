@@ -155,9 +155,10 @@ namespace FeelKnitService.Modules
             var feeling = Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(feelingId)));
             feeling.IsReported = true;
             feeling.ReportedAt = DateTime.UtcNow;
-            Context.Feelings.Save(feeling);
             var reportedBy = Request.Form["username"];
-            feeling.ReportedBy = Convert.ToString(reportedBy);
+            feeling.ReportedBy = reportedBy != null ? reportedBy.ToString() : string.Empty;
+            Context.Feelings.Save(feeling);
+
             Task.Run(() => EmailHelper.SendEmail("Feeling Reported!!", string.Format("FeelingId {0} of user {1} has been reported by {2}", feelingId, feeling.UserName, reportedBy)));
             return null;
         }
