@@ -81,5 +81,6 @@ namespace FeelKnitService.Model
             }
         }
 
+        public string ReportedBy { get; set; }
     }
 }

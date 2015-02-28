@@ -52,6 +52,8 @@ namespace FeelKnitService.Model
 
         public DateTime? PasswordExpiryTime { get; set; }
 
+        public DateTime RegisteredAt { get; set; }
+
         public double Latitude
         {
             get { return _latitude; }

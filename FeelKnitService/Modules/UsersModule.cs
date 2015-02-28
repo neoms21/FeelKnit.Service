@@ -146,6 +146,7 @@ namespace FeelKnitService.Modules
         {
             var user = this.Bind<User>();
             user.UserName = user.UserName.Trim();
+            user.RegisteredAt = DateTime.UtcNow;
             if (GetDbUser(user) != null)
                 return new { IsLoginSuccessful = false, Error = "Username is not unique." };
 
