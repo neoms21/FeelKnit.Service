@@ -6,9 +6,6 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using FeelKnitService;
-using FeelKnitService.Helpers;
-using FeelKnitService.Model;
 using MongoDB.Driver.Builders;
 using Nancy.Json;
 using Newtonsoft.Json;
@@ -24,19 +21,7 @@ namespace DataCreator
         private static readonly List<int> ConsumedRandoms = new List<int>();
         //private static string _jsonString = "";//@"{""object"":{""name"":""Name""}}";
         private static List<Tuple<string, int>> _feelings = new List<Tuple<string, int>>{
-            new Tuple<string,int>("Happy",1),
-            new Tuple<string,int>("Sad",2),
-            new Tuple<string,int>("Proud",3),
-            new Tuple<string,int>("Blessed",4),
-            new Tuple<string,int>("Worried",5),
-            new Tuple<string,int>("Frustrated",6),
-            new Tuple<string,int>("Lonely",7),
-            new Tuple<string,int>("Relieved",8),
-            new Tuple<string,int>("Sick",9),
-            new Tuple<string,int>("Loved",10),
-            new Tuple<string,int>("Embarassed",11),
-            new Tuple<string,int>("Ashamed",12),
-            new Tuple<string,int>("Scared",13),
+            new Tuple<string,int>("Excited",2),
         };
 
         private static List<Tuple<double, double>> _locations = new List<Tuple<double, double>>
@@ -90,7 +75,7 @@ namespace DataCreator
 "stella",
 "Thumbs"
         };
-        private static readonly FeelingsContext _context = new FeelingsContext();
+        //private static readonly FeelingsContext _context = new FeelingsContext();
         private static JavaScriptSerializer _javaScriptSerializer;
 
 
@@ -114,8 +99,8 @@ namespace DataCreator
 
             //var x = PasswordHash.ValidatePassword("HelloWorld", hash);
 
-          //  _context.ApplicationSettings.Insert(new ApplicationSetting { FeelingsUpdated = false });
-
+            //  _context.ApplicationSettings.Insert(new ApplicationSetting { FeelingsUpdated = false });
+            //   PostRequest();
             //_jsonString = javaScriptSerializer.Serialize(new User { User = "xyz", Password = "welcome1", EmailAddress = "ksjdf@fkjsd.com" });
             // EmailHelper.Send("sdfs", "sdfs", "sdfjks@as.com");
             // CreateFeels();
@@ -124,203 +109,218 @@ namespace DataCreator
             // CreateComments();
             // CreateApplicationSettings();
             CallService();
-           // SetAvatarsForFeeelings();
+            // SetAvatarsForFeeelings();
             Console.WriteLine("Done!!!!");
             Console.ReadLine();
             // PostRequest(jsonString, URL);
         }
 
 
-        private static void FormatComments()
-        {
-            var users = _context.Users.FindAll();
-            var feelings = _context.Feelings.FindAll().Where(f => f.Comments.Any() && f.Comments.All(c => c.User == null)).ToList();
-            Console.WriteLine(feelings.Count());
-            var index = 1;
-            var count = 2;
-            foreach (var feeling in feelings)
-            {
+        //private static void FormatComments()
+        //{
+        //    var users = _context.Users.FindAll();
+        //    var feelings = _context.Feelings.FindAll().Where(f => f.Comments.Any() && f.Comments.All(c => c.User == null)).ToList();
+        //    Console.WriteLine(feelings.Count());
+        //    var index = 1;
+        //    var count = 2;
+        //    foreach (var feeling in feelings)
+        //    {
 
-                foreach (var comment in feeling.Comments)
-                {
-                    var user = users.FirstOrDefault(u => u.UserName == comment.User);
-                    if (user != null)
-                        comment.User = user.UserName;
-                }
+        //        foreach (var comment in feeling.Comments)
+        //        {
+        //            var user = users.FirstOrDefault(u => u.UserName == comment.User);
+        //            if (user != null)
+        //                comment.User = user.UserName;
+        //        }
 
-                _context.Feelings.Save(feeling);
+        //        _context.Feelings.Save(feeling);
 
-                index++;
-            }
+        //        index++;
+        //    }
 
-            Console.WriteLine(index);
-        }
+        //    Console.WriteLine(index);
+        //}
 
-        private static void SetAvatars()
-        {
+        //private static void SetAvatars()
+        //{
 
-            var users = _context.Users.FindAll();
+        //    var users = _context.Users.FindAll();
 
-            foreach (var user in users)
-            {
-                var randomNumber = GetRandom(22);
-                user.Avatar = images[randomNumber];
-                _context.Users.Save(user);
-            }
-        }
+        //    foreach (var user in users)
+        //    {
+        //        var randomNumber = GetRandom(22);
+        //        user.Avatar = images[randomNumber];
+        //        _context.Users.Save(user);
+        //    }
+        //}
 
-        private static void SetAvatarsForFeeelings()
-        {
+        //private static void SetAvatarsForFeeelings()
+        //{
 
-            var feelings = _context.Feelings.FindAll();
-            var index = 1;
+        //    var feelings = _context.Feelings.FindAll();
+        //    var index = 1;
 
-            foreach (var feeling in feelings)
-            {
-                var user = _context.Users.FindOne(Query<User>.EQ(u => u.UserName, feeling.UserName));
-                feeling.UserAvatar = user.Avatar;
-                Console.WriteLine(index);
+        //    foreach (var feeling in feelings)
+        //    {
+        //        var user = _context.Users.FindOne(Query<User>.EQ(u => u.UserName, feeling.UserName));
+        //        feeling.UserAvatar = user.Avatar;
+        //        Console.WriteLine(index);
 
-                foreach (var comment in feeling.Comments)
-                {
-                    var user2 = _context.Users.FindOne(Query<User>.EQ(u => u.UserName, comment.User));
-                    comment.UserAvatar = user2.Avatar;
-                }
+        //        foreach (var comment in feeling.Comments)
+        //        {
+        //            var user2 = _context.Users.FindOne(Query<User>.EQ(u => u.UserName, comment.User));
+        //            comment.UserAvatar = user2.Avatar;
+        //        }
 
-                _context.Feelings.Save(feeling);
+        //        _context.Feelings.Save(feeling);
 
-                index++;
-            }
-        }
+        //        index++;
+        //    }
+        //}
 
         private async static void CallService()
         {
             var httpClient = new HttpClient();
-            string content = JsonConvert.SerializeObject(new User { UserName = "xxx", Password = "yyy" });
-            Console.WriteLine(content);
-            //var response = await httpClient.PostAsync(url, new StringContent(JsonConvert.SerializeObject(obj)));
-
-            //response.EnsureSuccessStatusCode();
-
-            //string content = await response.Content.ReadAsStringAsync();
-            //var resText = await Task.Run(() => JsonConvert.DeserializeObject(content));
-
-            HttpContent cntnt = new StringContent(JsonConvert.SerializeObject(content));
-
-            try
+           // httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+            //httpClient.DefaultRequestHeaders.Add("Content-Type", "application/json");
+            foreach (var feeling in _feelings)
             {
-                // Send the json to the server using POST
-                Task<HttpResponseMessage> getResponse = httpClient.GetAsync("http://feelknitapi.com/info");
-                // Wait for the response and read it to a string var
+                string content = JsonConvert.SerializeObject(new { Text = feeling.Item1, Rank = feeling.Item2 });
+                Console.WriteLine(content);
+                //var response = await httpClient.PostAsync(url, new StringContent(JsonConvert.SerializeObject(obj)));
 
-                HttpResponseMessage response = await getResponse;
-                var responseStr = await response.Content.ReadAsStringAsync();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error communicating with the server: " + e.Message);
-            }
+                //response.EnsureSuccessStatusCode();
 
-        }
+                //string content = await response.Content.ReadAsStringAsync();
+                //var resText = await Task.Run(() => JsonConvert.DeserializeObject(content));
 
-        private static void CreateApplicationSettings()
-        {
-            _context.ApplicationSettings.Insert(new ApplicationSetting { FeelingsUpdated = true });
-        }
+                var formContent = new FormUrlEncodedContent(new[]
+                                                {
+                                                    new KeyValuePair<string, string>("Text", feeling.Item1), 
+                                                    new KeyValuePair<string, string>("Rank", feeling.Item2.ToString()) 
+                                                });
+                //formContent.Headers.Add("Content-Type", "application/json");
+               // HttpContent cntnt = new StringContent(JsonConvert.SerializeObject(content));
 
-        private static void CreateFeels()
-        {
-            foreach (var f in _feelings)
-            {
-                var feeling = new Feel
+                try
                 {
-                    Text = f.Item1,
-                    Rank = f.Item2
-                };
-                PostRequest(_javaScriptSerializer.Serialize(feeling), "http://localhost/FeelKnitService/feelings/createfeel");
-            }
+                    // Send the json to the server using POST
+                    var getResponse = httpClient.PostAsync("http://localhost/FeelknitService/Feelings/createfeel", formContent);
+                    // Wait for the response and read it to a string var
 
-        }
-
-        private static void CreateComments()
-        {
-            var res = GetRequest("http://localhost/FeelKnitService/feelings.json");
-
-            var feelings = _javaScriptSerializer.Deserialize<IEnumerable<Feeling>>(res);
-            var random = new Random();
-            foreach (var feeling in feelings)
-            {
-                for (int i = 0; i < 20; i++)
-                {
-
-                    var comment = new Comment()
-                    {
-                        Text = _comments[random.Next(1, 7)],
-                        User = "User" + random.Next(1, 11)
-                    };
-
-                    PostRequest(_javaScriptSerializer.Serialize(comment),
-                        string.Format("http://localhost/FeelKnitService/comments/{0}", feeling.Id));
+                    var response = await getResponse;
+                  //  response.EnsureSuccessStatusCode();
+                    var responseStr = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine(responseStr);
                 }
-
-                Console.WriteLine(feeling.Id);
-            }
-        }
-
-        private static void CreateComments(Feeling feeling)
-        {
-            var random = new Random();
-
-            for (var i = 0; i < 20; i++)
-            {
-
-                var comment = new Comment()
+                catch (Exception e)
                 {
-                    Text = _comments[random.Next(1, 7)],
-                    User = "User" + random.Next(1, 11),
-                    PostedAt = feeling.FeelingDate.AddMinutes(10 + i)
-                };
-                feeling.Comments.Add(comment);
+                    Console.WriteLine("Error communicating with the server: " + e.Message);
+                }
             }
+
+
+
         }
 
-        //private static void CreateFeelings()
+        //private static void CreateApplicationSettings()
         //{
-        //    for (var i = 1; i < 201; i++)
+        //    _context.ApplicationSettings.Insert(new ApplicationSetting { FeelingsUpdated = true });
+        //}
+
+        //private static void CreateFeels()
+        //{
+        //    foreach (var f in _feelings)
         //    {
-        //        var index = new Random().Next(1, _locations.Count);
-        //        var feeling = new Feeling
+        //        var feeling = new Feel
         //        {
-        //            FeelingText = _feelings[GetRandom(_feelings.Count())],
-        //            FeelingDate = DateTime.UtcNow.AddDays(-new Random().Next(1, 11)),
-        //            UserName = "User" + new Random().Next(1, 11),
-        //            Reason = "reason for feeling",
-        //            Action = "action for feeling",
-        //            Longitude = _locations[index].Item2,
-        //            Latitude = _locations[index].Item1,
-        //            Comments = new List<Comment>()
+        //            Text = f.Item1,
+        //            Rank = f.Item2
         //        };
-        //        CreateComments(feeling);
-        //        PostRequest(_javaScriptSerializer.Serialize(feeling), "http://localhost/FeelKnitService/feelings");
-        //        Console.WriteLine("Feeling num {0} created", i);
+        //        PostRequest(_javaScriptSerializer.Serialize(feeling), "http://localhost/FeelKnitService/feelings/createfeel");
+        //    }
+
+        //}
+
+        //private static void CreateComments()
+        //{
+        //    var res = GetRequest("http://localhost/FeelKnitService/feelings.json");
+
+        //    var feelings = _javaScriptSerializer.Deserialize<IEnumerable<Feeling>>(res);
+        //    var random = new Random();
+        //    foreach (var feeling in feelings)
+        //    {
+        //        for (int i = 0; i < 20; i++)
+        //        {
+
+        //            var comment = new Comment()
+        //            {
+        //                Text = _comments[random.Next(1, 7)],
+        //                User = "User" + random.Next(1, 11)
+        //            };
+
+        //            PostRequest(_javaScriptSerializer.Serialize(comment),
+        //                string.Format("http://localhost/FeelKnitService/comments/{0}", feeling.Id));
+        //        }
+
+        //        Console.WriteLine(feeling.Id);
         //    }
         //}
 
-        private static void CreateUsers()
-        {
-            for (int i = 1; i < 11; i++)
-            {
-                var username = "User" + GetRandom(11);
-                var user = new User
-                {
-                    UserName = username,
-                    Password = "Welcome1",
-                    EmailAddress = username + "@gmail.com"
-                };
-                PostRequest(_javaScriptSerializer.Serialize(user), "http://localhost/FeelKnitService/users");
-                //Console.WriteLine("Success for {0}", username);
-            }
-        }
+        //private static void CreateComments(Feeling feeling)
+        //{
+        //    var random = new Random();
+
+        //    for (var i = 0; i < 20; i++)
+        //    {
+
+        //        var comment = new Comment()
+        //        {
+        //            Text = _comments[random.Next(1, 7)],
+        //            User = "User" + random.Next(1, 11),
+        //            PostedAt = feeling.FeelingDate.AddMinutes(10 + i)
+        //        };
+        //        feeling.Comments.Add(comment);
+        //    }
+        //}
+
+        ////private static void CreateFeelings()
+        ////{
+        ////    for (var i = 1; i < 201; i++)
+        ////    {
+        ////        var index = new Random().Next(1, _locations.Count);
+        ////        var feeling = new Feeling
+        ////        {
+        ////            FeelingText = _feelings[GetRandom(_feelings.Count())],
+        ////            FeelingDate = DateTime.UtcNow.AddDays(-new Random().Next(1, 11)),
+        ////            UserName = "User" + new Random().Next(1, 11),
+        ////            Reason = "reason for feeling",
+        ////            Action = "action for feeling",
+        ////            Longitude = _locations[index].Item2,
+        ////            Latitude = _locations[index].Item1,
+        ////            Comments = new List<Comment>()
+        ////        };
+        ////        CreateComments(feeling);
+        ////        PostRequest(_javaScriptSerializer.Serialize(feeling), "http://localhost/FeelKnitService/feelings");
+        ////        Console.WriteLine("Feeling num {0} created", i);
+        ////    }
+        ////}
+
+        //private static void CreateUsers()
+        //{
+        //    for (int i = 1; i < 11; i++)
+        //    {
+        //        var username = "User" + GetRandom(11);
+        //        var user = new User
+        //        {
+        //            UserName = username,
+        //            Password = "Welcome1",
+        //            EmailAddress = username + "@gmail.com"
+        //        };
+        //        PostRequest(_javaScriptSerializer.Serialize(user), "http://localhost/FeelKnitService/users");
+        //        //Console.WriteLine("Success for {0}", username);
+        //    }
+        //}
 
         private static void PostRequest(string json, string url)
         {
