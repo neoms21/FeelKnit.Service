@@ -162,6 +162,7 @@ namespace FeelKnitService.Modules
                 if (user == null || string.IsNullOrWhiteSpace(user.Key) || user.UserName.Equals(feeling.UserName))
                     continue;
 
+
                 keys.Add(user.Key);
             }
 
