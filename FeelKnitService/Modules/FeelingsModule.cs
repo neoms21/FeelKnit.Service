@@ -146,7 +146,27 @@ namespace FeelKnitService.Modules
             allFeelings.Remove(currentFeeling);
             RemoveDeletedComments(allFeelings);
             AddUserAvatar(allFeelings);
+            Task.Run(() => SendNotification(feeling));
             return allFeelings;
+        }
+
+        private Task<object> SendNotification(Feeling feeling)
+        {
+            var feelings =
+                Context.Feelings.Find(Query.And(Query.EQ("FeelingText", new BsonString(feeling.FeelingText)),
+                    Query.EQ("IsCurrentFeeling", new BsonBoolean(true))));
+            var keys = new List<string>();
+            foreach (var f in feelings)
+            {
+                var user = Context.Users.FindOne(Query.EQ("UserName", new BsonString(f.UserName)));
+                if (user == null || string.IsNullOrWhiteSpace(user.Key) || user.UserName.Equals(feeling.UserName))
+                    continue;
+
+                keys.Add(user.Key);
+            }
+
+            new GcmService().SendGcmRequest(keys, string.Format("User {0} has just added a feeling as {1}. Start sharing.", feeling.UserName, feeling.FeelingText));
+            return null;
         }
 
         private dynamic ReportFeeling()

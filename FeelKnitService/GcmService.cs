@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using FeelKnitService.Helpers;
 using FeelKnitService.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -61,6 +62,52 @@ namespace FeelKnitService
                     {"message", message},
                     {"user", userNameFromComment},
                     {"feeling", JsonConvert.SerializeObject(feeling.Id, Formatting.Indented, jsonSerializerSettings)}
+                };
+
+                jsonObject.Add("data", data);
+                var postData = JsonConvert.SerializeObject(jsonObject);
+                var byteArray = Encoding.UTF8.GetBytes(postData);
+                request.ContentType = "application/json";
+                request.Headers.Add(string.Format("Authorization: key={0}", "AIzaSyBQe8AA1hv5zW2SJ308KUHXqBnMNee0950"));
+                // Set the ContentLength property of the WebRequest.
+                request.ContentLength = byteArray.Length;
+                var dataStream = request.GetRequestStream();
+                dataStream.Write(byteArray, 0, byteArray.Length);
+                dataStream.Close();
+                var response = request.GetResponse();
+
+                using (var reader = new StreamReader(response.GetResponseStream()))
+                {
+                    var responseFromServer = reader.ReadToEnd();
+                    if (responseFromServer.Contains("failure\":1"))
+                        _action(responseFromServer);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                _action(e.ToString());
+            }
+        }
+
+        public void SendGcmRequest(IEnumerable<string> gcmTokens, string message)
+        {
+            // Create a request using a URL that can receive a post. 
+            try
+            {
+
+                var request = WebRequest.Create("https://android.googleapis.com/gcm/send");
+                // Set the Method property of the request to POST.
+                request.Method = "POST";
+                var jsonObject = new JObject();
+                var arr = new JArray();
+                gcmTokens.ForEach(u => arr.Add(u));
+                jsonObject.Add("registration_ids", arr);
+
+                var data = new JObject
+                {
+                    {"message", message},
+                    //{"feelingId", JsonConvert.SerializeObject(feeling.Id, Formatting.Indented, jsonSerializerSettings)}
                 };
 
                 jsonObject.Add("data", data);
