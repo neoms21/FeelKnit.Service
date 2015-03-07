@@ -5,6 +5,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace FeelKnitService.Model
 {
+    //Comment for branch testing
     public class Feeling
     {
         private double _latitude;
