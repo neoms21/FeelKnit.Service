@@ -34,17 +34,20 @@ namespace FeelKnitService.Modules
 
         private IEnumerable<dynamic> GetCurrentFeelings()
         {
+            var days = Properties.Settings.Default.RecentFeelingsDays;
             var currentFeelings =
                 Context.Feelings.Find(Query.And(
-                    Query.GTE("FeelingDate", new BsonDateTime(DateTime.UtcNow.AddDays(-3))),
+                    Query.GTE("FeelingDate", new BsonDateTime(DateTime.UtcNow.AddDays(Convert.ToInt32(days)))),
                     Query.GTE("IsCurrentFeeling", new BsonBoolean(true)),
-                    Query.NE("IsDeleted", new BsonBoolean(true))));
+                    Query.NE("IsDeleted", new BsonBoolean(true)))).ToList();
+            AddUserAvatar(currentFeelings);
             return currentFeelings.Select(f => new
             {
                 f.Id,
                 f.FeelingText,
                 f.FeelingDate,
                 f.Reason,
+                f.IsReported,
                 f.UserName,
                 f.UserAvatar,
                 f.SupportCount,
