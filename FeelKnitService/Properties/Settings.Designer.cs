@@ -34,8 +34,7 @@ namespace FeelKnitService.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("mongodb://appharbor:65b0d509e8eb92bd3c3a07441154d454@boone.mongohq.com:10000/6f66" +
-            "b9b6_294c_495c_9839_706243311808")]
+        [global::System.Configuration.DefaultSettingValueAttribute("mongodb://localhost:27017/6f66b9b6_294c_495c_9839_706243311808")]
         public string MONGOHQ_URL {
             get {
                 return ((string)(this["MONGOHQ_URL"]));

@@ -23,12 +23,35 @@ namespace FeelKnitService.Modules
             Get["/comments/{username}"] = r => FindFeelingsForCommentsUser(r.username);
             Get["/relatedfeelings/{username}"] = r => FindRelatedFeelingsForUser(r.username);
             Get["/getfeels"] = r => Fetchfeels();
+            Get["/current"] = r => GetCurrentFeelings();
 
             Post["/"] = r => CreateFeeling();
             Post["/increasesupport"] = r => IncreaseSupportCount();
             Post["/decreasesupport"] = r => DecreaseSupportCount();
             Post["/report"] = r => ReportFeeling();
             Post["/createfeel/"] = r => CreateFeels();
+        }
+
+        private IEnumerable<dynamic> GetCurrentFeelings()
+        {
+            var currentFeelings =
+                Context.Feelings.Find(Query.And(
+                    Query.GTE("FeelingDate", new BsonDateTime(DateTime.UtcNow.AddDays(-3))),
+                    Query.GTE("IsCurrentFeeling", new BsonBoolean(true)),
+                    Query.NE("IsDeleted", new BsonBoolean(true))));
+            return currentFeelings.Select(f => new
+            {
+                f.Id,
+                f.FeelingText,
+                f.FeelingDate,
+                f.Reason,
+                f.UserName,
+                f.UserAvatar,
+                f.SupportCount,
+                f.SupportUsers,
+                CommentsCount = f.Comments.Count
+            }).OrderByDescending(x => x.FeelingDate);
+
         }
 
         private IEnumerable<Feeling> FindRelatedFeelingsForUser(object username)

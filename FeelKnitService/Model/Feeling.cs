@@ -28,7 +28,7 @@ namespace FeelKnitService.Model
             set
             {
                 _feelingText = value;
-                FeelingTextLower = value.ToLower();
+                FeelingTextLower = value == null ? null : value.ToLower();
             }
         }
 
@@ -83,5 +83,6 @@ namespace FeelKnitService.Model
         }
 
         public string ReportedBy { get; set; }
+        public int CommentsCount { get; set; }
     }
 }
