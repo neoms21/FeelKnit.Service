@@ -32,6 +32,7 @@ namespace FeelKnitService.Modules
             Post["/createfeel/"] = r => CreateFeels();
         }
 
+        //To get the current Feelings
         private IEnumerable<dynamic> GetCurrentFeelings()
         {
             var days = Properties.Settings.Default.RecentFeelingsDays;
