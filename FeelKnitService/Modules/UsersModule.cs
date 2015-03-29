@@ -183,14 +183,15 @@ namespace FeelKnitService.Modules
             return token;
         }
 
-        private bool UpdateUserProfile()
+        private dynamic UpdateUserProfile()
         {
+
             var user = this.Bind<User>();
             var dbUser = GetUser(user.UserName);
             dbUser.Avatar = user.Avatar;
             dbUser.EmailAddress = user.EmailAddress;
             Context.Users.Save(dbUser);
-            return true;
+            return "True";
         }
 
         private User GetDbUser(User user)

@@ -23,6 +23,11 @@ namespace FeelKnitService
                     Claims = user.Claims.Where(x => x.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role").Select(x => x.Value)
                 };
             }
+
+            pipelines.OnError.AddItemToEndOfPipeline((z, a) =>
+            {
+                return null;
+            });
         }
     }
 }

@@ -9,7 +9,7 @@
       <Value Profile="(Default)">mongodb://localhost:27017/6f66b9b6_294c_495c_9839_706243311808</Value>
     </Setting>
     <Setting Name="RecentFeelingsDays" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">-3</Value>
+      <Value Profile="(Default)">-15</Value>
     </Setting>
   </Settings>
 </SettingsFile>

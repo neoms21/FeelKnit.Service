@@ -10,10 +10,12 @@ using MongoDB.Driver.Builders;
 using MongoDB.Driver.Linq;
 using Nancy.ModelBinding;
 
+
 namespace FeelKnitService.Modules
 {
     public class FeelingsModule : BaseModule
     {
+
         public FeelingsModule()
             : base("/feelings")
         {
@@ -74,7 +76,6 @@ namespace FeelKnitService.Modules
 
         private IEnumerable<string> Fetchfeels()
         {
-            // var push = new PushNotificationApple();
             var feels = Context.Feels.AsQueryable();
             return feels.OrderBy(x => x.Text).Select(x => x.Text);
         }
@@ -173,28 +174,31 @@ namespace FeelKnitService.Modules
             allFeelings.Remove(currentFeeling);
             RemoveDeletedComments(allFeelings);
             AddUserAvatar(allFeelings);
-            Task.Run(() => SendNotification(feeling));
+            LogWriter.Write("Feeling Created!!!");
+            SendNotification(feeling);
             return allFeelings;
         }
 
-        private Task<object> SendNotification(Feeling feeling)
+        private void SendNotification(Feeling feeling)
         {
             var feelings =
                 Context.Feelings.Find(Query.And(Query.EQ("FeelingText", new BsonString(feeling.FeelingText)),
                     Query.EQ("IsCurrentFeeling", new BsonBoolean(true))));
-            var keys = new List<string>();
+            var users = new List<User>();
             foreach (var f in feelings)
             {
                 var user = Context.Users.FindOne(Query.EQ("UserName", new BsonString(f.UserName)));
-                if (user == null || string.IsNullOrWhiteSpace(user.Key) || user.UserName.Equals(feeling.UserName))
+                if (user == null || (string.IsNullOrWhiteSpace(user.Key) && string.IsNullOrWhiteSpace(user.IosKey)) || user.UserName.Equals(feeling.UserName))
                     continue;
 
-
-                keys.Add(user.Key);
+                users.Add(user);
             }
-
-            new GcmService().SendGcmRequest(keys, string.Format("User {0} has just added a feeling as {1}. Start sharing.", feeling.UserName, feeling.FeelingText));
-            return null;
+            if (!users.Any())
+                LogWriter.Write("No users found for same feeling");
+            users.ForEach(u => LogWriter.Write(string.Format("{0} Key:{1}  IosKey:{2}\n", u.UserName, u.Key, u.IosKey)));
+            var gcmUserKeys = users.Where(u => !string.IsNullOrWhiteSpace(u.Key)).Select(x => x.Key);
+            var iosUserKeys = users.Where(u => !string.IsNullOrWhiteSpace(u.IosKey)).Select(x => x.IosKey);
+            new PushNotificationService().SendSameFeelingNotification(gcmUserKeys, iosUserKeys, string.Format("User {0} has just added a feeling as {1}. Start sharing.", feeling.UserName, feeling.FeelingText));
         }
 
         private dynamic ReportFeeling()

@@ -32,24 +32,27 @@ namespace FeelKnitService.Modules
             var modUpdate1 = Update<Feeling>.Push(p => p.Comments, comment);
 
             Context.Feelings.Update(Query.EQ("_id", new ObjectId(feelingId)), modUpdate1);
-            Task.Factory.StartNew(delegate
-            {
-                var feeling =
-                    Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(new ObjectId(feelingId.ToString()))));
-                var feelingUser = Context.Users.FindOne(Query.EQ("UserName", new BsonString(feeling.UserName))); //prits
-                var commentUsers =
-                    feeling.Comments.Select(c => c.User)
-                        .Where(x => x != feeling.UserName && x != comment.User)
-                        .Distinct()
-                        .ToList(); //neo
-                var bsonValues = new List<BsonValue>();
-                commentUsers.ForEach(c => bsonValues.Add(BsonValue.Create(c)));
-                var users = Context.Users.Find(Query.In("UserName", bsonValues)).ToList();
-                //.First(u => u.UserName.Equals(feeling.UserName));
-                SendNotification(feeling, comment, users, feelingUser);
-            });
-
+            SendNotification(feelingId, comment);
             return comment;
+        }
+
+        private void SendNotification(dynamic feelingId, Comment comment)
+        {
+
+            var feeling =
+                Context.Feelings.FindOne(Query.EQ("_id", new BsonObjectId(new ObjectId(feelingId.ToString()))));
+            var feelingUser = Context.Users.FindOne(Query.EQ("UserName", new BsonString(feeling.UserName))); //prits
+            var commentUsers =
+                feeling.Comments.Select(c => c.User)
+                    .Where(x => x != feeling.UserName && x != comment.User)
+                    .Distinct()
+                    .ToList(); //neo
+            var bsonValues = new List<BsonValue>();
+            commentUsers.ForEach(c => bsonValues.Add(BsonValue.Create(c)));
+            var users = Context.Users.Find(Query.In("UserName", bsonValues)).ToList();
+            //.First(u => u.UserName.Equals(feeling.UserName));
+            SendNotification(feeling, comment, users, feelingUser);
+
         }
 
         private object ReportComment()
@@ -72,11 +75,11 @@ namespace FeelKnitService.Modules
         {
             try
             {
-                new GcmService().SendRequest(feeling, comment, users, SaveResponse, feelingUser);
+                new PushNotificationService().SendCommentNotifications(feeling, comment, users, SaveResponse, feelingUser);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LogWriter.Write(e.ToString());
             }
         }
 
