@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FeelKnitService.Helpers;
 using FeelKnitService.Model;
@@ -8,6 +9,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using MongoDB.Driver.Linq;
+using Nancy;
 using Nancy.ModelBinding;
 
 
@@ -27,7 +29,7 @@ namespace FeelKnitService.Modules
             Get["/getfeels"] = r => Fetchfeels();
             Get["/current"] = r => GetCurrentFeelings();
 
-            Post["/"] = r => CreateFeeling();
+            Post["/", true] = async (r, x) => await CreateFeeling();
             Post["/increasesupport"] = r => IncreaseSupportCount();
             Post["/decreasesupport"] = r => DecreaseSupportCount();
             Post["/report"] = r => ReportFeeling();
@@ -158,8 +160,9 @@ namespace FeelKnitService.Modules
             return finalFeelings;
         }
 
-        private IEnumerable<Feeling> CreateFeeling()
+        private async Task<dynamic> CreateFeeling()
         {
+
             var feeling = this.Bind<Feeling>();
             var query = Query.And(Query.EQ("UserName", new BsonString(feeling.UserName)), Query.EQ("IsCurrentFeeling", new BsonBoolean(true)));
             var update = Update.Set("IsCurrentFeeling", new BsonBoolean(false));
@@ -175,11 +178,11 @@ namespace FeelKnitService.Modules
             RemoveDeletedComments(allFeelings);
             AddUserAvatar(allFeelings);
             LogWriter.Write("Feeling Created!!!");
-            SendNotification(feeling);
+            await Task.Factory.StartNew(() => SendNotification(feeling));
             return allFeelings;
         }
 
-        private void SendNotification(Feeling feeling)
+        private dynamic SendNotification(Feeling feeling)
         {
             var feelings =
                 Context.Feelings.Find(Query.And(Query.EQ("FeelingText", new BsonString(feeling.FeelingText)),
@@ -199,6 +202,7 @@ namespace FeelKnitService.Modules
             var gcmUserKeys = users.Where(u => !string.IsNullOrWhiteSpace(u.Key)).Select(x => x.Key);
             var iosUserKeys = users.Where(u => !string.IsNullOrWhiteSpace(u.IosKey)).Select(x => x.IosKey);
             new PushNotificationService().SendSameFeelingNotification(gcmUserKeys, iosUserKeys, string.Format("User {0} has just added a feeling as {1}. Start sharing.", feeling.UserName, feeling.FeelingText));
+            return true;
         }
 
         private dynamic ReportFeeling()

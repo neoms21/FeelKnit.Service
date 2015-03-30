@@ -16,11 +16,11 @@ namespace FeelKnitService.Modules
         public CommentsModule()
             : base("/comments")
         {
-            Post["/{feelingId}"] = r => AddComment(r.feelingId);
+            Post["/{feelingId}", true] = async (r, c) => await AddComment(r.feelingId);
             Post["/report"] = r => ReportComment();
         }
 
-        private object AddComment(dynamic feelingId)
+        private async Task<object> AddComment(dynamic feelingId)
         {
             //var feeling = Context.Feelings.FindOneById(new ObjectId(feelingId));
             var comment = this.Bind<Comment>();
@@ -32,11 +32,11 @@ namespace FeelKnitService.Modules
             var modUpdate1 = Update<Feeling>.Push(p => p.Comments, comment);
 
             Context.Feelings.Update(Query.EQ("_id", new ObjectId(feelingId)), modUpdate1);
-            SendNotification(feelingId, comment);
+            await Task.Factory.StartNew(() => SendNotification(feelingId, comment));
             return comment;
         }
 
-        private void SendNotification(dynamic feelingId, Comment comment)
+        private dynamic SendNotification(dynamic feelingId, Comment comment)
         {
 
             var feeling =
@@ -52,7 +52,7 @@ namespace FeelKnitService.Modules
             var users = Context.Users.Find(Query.In("UserName", bsonValues)).ToList();
             //.First(u => u.UserName.Equals(feeling.UserName));
             SendNotification(feeling, comment, users, feelingUser);
-
+            return true;
         }
 
         private object ReportComment()

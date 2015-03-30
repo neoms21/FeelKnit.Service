@@ -38,7 +38,7 @@ namespace FeelKnitService
                 return;
 
             var byteArray = GetGcmData(userNameFromComment, users, message, feeling);
-            SendAndroidNotification(byteArray);
+            if (byteArray != null) SendAndroidNotification(byteArray);
 
             SendIosNotification(users.Where(u => !string.IsNullOrWhiteSpace(u.IosKey)).Select(u => u.IosKey),
                 string.Format("{0} from {1}", message, userNameFromComment), new Dictionary<string, string> { { "feelingId", feeling.Id } });
@@ -50,6 +50,9 @@ namespace FeelKnitService
             var jsonObject = new JObject();
             var arr = new JArray();
             users.Where(u => !string.IsNullOrWhiteSpace(u.Key)).ForEach(u => arr.Add(u.Key));
+            if (!arr.Any())
+                return null;
+
             jsonObject.Add("registration_ids", arr);
             var jsonSerializerSettings = new JsonSerializerSettings
             {
