@@ -15,9 +15,9 @@ namespace FeelKnitService.Push
                     payload.AddCustom(customValue.Key, customValue.Value);
                 }
             //payload1.AddCustom("CustomKey", "CustomValue");
-            LogWriter.Write(deviceToken);
+            LogWriter.Write(deviceToken + message);
             var notificationList = new List<NotificationPayload> { payload };
-            var push = new PushNotification(true, System.Web.Hosting.HostingEnvironment.MapPath("~/bin/feelknit-dev.p12"), "test123");
+            var push = new PushNotification(false, System.Web.Hosting.HostingEnvironment.MapPath("~/bin/feelknit-adhoc-apns.p12"), "test123");
             push.SendToApple(notificationList);
         }
     }
