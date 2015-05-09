@@ -9,7 +9,13 @@
       <Value Profile="(Default)">mongodb://localhost:27017/6f66b9b6_294c_495c_9839_706243311808</Value>
     </Setting>
     <Setting Name="RecentFeelingsDays" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">-15</Value>
+      <Value Profile="(Default)">-25</Value>
+    </Setting>
+    <Setting Name="ApnsCertificateName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Feelknit_Prod</Value>
+    </Setting>
+    <Setting Name="ApnsCertificatePassword" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">S1lverarr0w</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -43,10 +43,28 @@ namespace FeelKnitService.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-15")]
+        [global::System.Configuration.DefaultSettingValueAttribute("-25")]
         public string RecentFeelingsDays {
             get {
                 return ((string)(this["RecentFeelingsDays"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Feelknit_Prod")]
+        public string ApnsCertificateName {
+            get {
+                return ((string)(this["ApnsCertificateName"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("S1lverarr0w")]
+        public string ApnsCertificatePassword {
+            get {
+                return ((string)(this["ApnsCertificatePassword"]));
             }
         }
     }
