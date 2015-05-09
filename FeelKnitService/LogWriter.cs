@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-
-namespace FeelKnitService
+﻿namespace FeelKnitService
 {
     public static class LogWriter
     {
@@ -17,8 +13,8 @@ namespace FeelKnitService
 
         public static void Write(string message)
         {
-            string path = Path.GetDirectoryName((new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath);
-            File.AppendAllText(Path.Combine(path, "Log.txt"), string.Format("{0} - {1}\n", DateTime.UtcNow.ToString("F"), message));
+            //string path = Path.GetDirectoryName((new Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath);
+            //File.AppendAllText(Path.Combine(path, "Log.txt"), string.Format("{0} - {1}\n", DateTime.UtcNow.ToString("F"), message));
         }
     }
 }
